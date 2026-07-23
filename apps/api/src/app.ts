@@ -1,5 +1,6 @@
 import { trpcServer } from '@hono/trpc-server'
 import { createDb, type AppDb } from '@zoo/db'
+import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
@@ -51,6 +52,33 @@ export function createApp(env: ServerEnv, db: AppDb = createDb(env.DATABASE_URL)
 
   /** Plain HTTP liveness probe for load balancers, which do not speak tRPC. */
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
+
+  /**
+   * Temporary diagnostic: proves whether THIS process can actually reach the
+   * database, with a short timeout so a bad DATABASE_URL fails fast instead of
+   * hanging the whole function. Unauthenticated but harmless (SELECT 1, no data).
+   */
+  app.get('/api/db-check', async (c) => {
+    const started = Date.now()
+    try {
+      await Promise.race([
+        db.execute(sql`select 1 as ok`),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('DB query timed out after 8s')), 8000),
+        ),
+      ])
+      return c.json({ ok: true, ms: Date.now() - started })
+    } catch (error) {
+      return c.json(
+        {
+          ok: false,
+          ms: Date.now() - started,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        500,
+      )
+    }
+  })
 
   /**
    * The whole HTTP surface lives under /api so a single-domain host (Vercel)
