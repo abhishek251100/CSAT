@@ -99,7 +99,12 @@ export function createApp(env: ServerEnv, db: AppDb = createDb(env.DATABASE_URL)
          * caller is or what they can see is ever read from the request body —
          * §12 forbids trusting client-sent scope.
          */
-        const authenticated = await auth.api.getSession({ headers: c.req.raw.headers })
+        // Build the Headers from Hono's own typed `header()` (a Record) rather
+        // than `c.req.raw.headers`. Hono types `raw` as the ambient global
+        // `Request`, whose `headers` property disappears in a compile that can't
+        // resolve @types/node's fetch types (e.g. a stray `tsc` over this package
+        // where `undici-types` isn't resolved) — see TS2339 on `Request.headers`.
+        const authenticated = await auth.api.getSession({ headers: new Headers(c.req.header()) })
 
         if (!authenticated) {
           return { env, db, requestId, session: null }
