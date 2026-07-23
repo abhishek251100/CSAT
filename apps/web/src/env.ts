@@ -10,6 +10,18 @@ import { z } from 'zod'
  * Validated at module load so a misconfigured build fails at startup with a
  * readable message rather than as a confusing runtime fetch error.
  */
+/**
+ * Default API origin, chosen by build mode so a production deploy needs no env
+ * var at all:
+ *   - production build (`vite build`, e.g. on Vercel): the empty string, so the
+ *     browser uses same-origin relative URLs (`/api/...`) — the single-domain
+ *     setup. Setting VITE_API_URL to a full origin overrides this for a
+ *     split-origin deploy.
+ *   - dev (`vite`): the local API on :8787, since the web dev server and API
+ *     run on different ports.
+ */
+const defaultApiUrl = import.meta.env.PROD ? '' : 'http://localhost:8787'
+
 const clientEnvSchema = z.object({
   /**
    * Base origin of the API. Two shapes are valid:
@@ -21,7 +33,7 @@ const clientEnvSchema = z.object({
    */
   VITE_API_URL: z
     .union([z.literal(''), z.url()])
-    .default('http://localhost:8787')
+    .default(defaultApiUrl)
     .refine((value) => !value.endsWith('/'), 'VITE_API_URL must not end with a slash'),
 })
 
