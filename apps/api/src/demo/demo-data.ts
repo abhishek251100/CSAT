@@ -104,7 +104,7 @@ const CSAT_QUESTIONS: readonly string[] = [
   'How satisfied were you with how proactively the team brought ideas, flagged risks, or spotted opportunities?',
 ]
 const CSAT_FEEDBACK_QUESTION =
-  "Add any critical feedback you have for us, and let us know how we can improve the service for you."
+  'Add any critical feedback you have for us, and let us know how we can improve the service for you.'
 
 /** The single NPS question (a separate instrument from the CSAT form). */
 const NPS_QUESTION = 'How likely are you to recommend us to a colleague or peer?'
@@ -162,7 +162,9 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
  */
 function driverAnswers(headline: number, seed: number): number[] {
   const offsets = [0, -1, 1, -1, 0, 1] // Q1 fixed at headline; the rest nudge
-  return offsets.map((base, k) => (k === 0 ? headline : clamp(headline + base + ((seed + k) % 3) - 1, 1, 5)))
+  return offsets.map((base, k) =>
+    k === 0 ? headline : clamp(headline + base + ((seed + k) % 3) - 1, 1, 5),
+  )
 }
 
 // ------------------------------------------------------------------ seed
@@ -285,7 +287,9 @@ export async function seedDemo(db: AppDb, now: Date): Promise<DemoScope> {
             responseId: row.id,
             questionId: csat.feedbackQuestionId,
             questionLabel: CSAT_FEEDBACK_QUESTION,
-            answerText: isDsat ? (DRIVER_FEEDBACK[lowestDriver] || POSITIVE_FEEDBACK) : POSITIVE_FEEDBACK,
+            answerText: isDsat
+              ? DRIVER_FEEDBACK[lowestDriver] || POSITIVE_FEEDBACK
+              : POSITIVE_FEEDBACK,
           })
         }
 
@@ -565,7 +569,13 @@ async function createNpsSurvey(
 
   const [question] = await db
     .insert(surveyQuestions)
-    .values({ surveyId: survey.id, prompt: NPS_QUESTION, kind: 'scale', position: 0, isRequired: true })
+    .values({
+      surveyId: survey.id,
+      prompt: NPS_QUESTION,
+      kind: 'scale',
+      position: 0,
+      isRequired: true,
+    })
     .returning({ id: surveyQuestions.id })
   if (!question) throw new Error('Failed to create demo NPS question')
 

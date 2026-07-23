@@ -24,14 +24,14 @@ is empty), so it always targets its own origin.
 
 Import this repo in Vercel, then set:
 
-| Setting | Value |
-|---|---|
-| **Root Directory** | `apps/web` |
-| **Framework Preset** | Vite (auto-detected) |
-| **Build Command** | `vite build` (from `apps/web/vercel.json`) |
-| **Output Directory** | `dist` (from `apps/web/vercel.json`) |
-| **Install Command** | leave default — Vercel runs `pnpm install` at the repo root and links the whole workspace |
-| **Node.js Version** | 22.x (matches `engines.node >=22.13`) |
+| Setting              | Value                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| **Root Directory**   | `apps/web`                                                                                |
+| **Framework Preset** | Vite (auto-detected)                                                                      |
+| **Build Command**    | `vite build` (from `apps/web/vercel.json`)                                                |
+| **Output Directory** | `dist` (from `apps/web/vercel.json`)                                                      |
+| **Install Command**  | leave default — Vercel runs `pnpm install` at the repo root and links the whole workspace |
+| **Node.js Version**  | 22.x (matches `engines.node >=22.13`)                                                     |
 
 Vercel reads `packageManager` (`pnpm@10.34.5`) from the root `package.json` and
 uses pnpm automatically. The `api/` folder under the root directory is detected
@@ -46,19 +46,19 @@ variables are read by the serverless function from `process.env`; a missing
 required one makes every `/api/*` call fail loudly at cold start rather than
 running half-configured.
 
-| Variable | Value | Notes |
-|---|---|---|
-| `DATABASE_URL` | your Neon `postgres://…` string | required |
-| `BETTER_AUTH_SECRET` | 32+ random chars | required — rotating it logs everyone out |
-| `BETTER_AUTH_URL` | `https://<your-app>.vercel.app` | required — must equal the domain you visit; builds the OAuth callback |
-| `WEB_ORIGIN` | `https://<your-app>.vercel.app` | required — better-auth trusted origin (CSRF); same value as above |
-| `ALLOWED_EMAIL_DOMAINS` | `thestarterlabs.com` (comma-separated for more) | required — the domain wall for Google sign-in |
-| `SUPERADMIN_EMAIL` | break-glass admin email | required |
-| `SUPERADMIN_PASSWORD` | break-glass password (12+ chars) | required |
-| `GOOGLE_CLIENT_ID` | Google OAuth client id | optional — omit to disable Google, break-glass still works |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | optional |
-| `VITE_API_URL` | **empty string** (`""`) | build-time; empty = same-origin. **Do not** set it to a URL. |
-| `NODE_ENV` | `production` | Vercel sets this automatically |
+| Variable                | Value                                           | Notes                                                                 |
+| ----------------------- | ----------------------------------------------- | --------------------------------------------------------------------- |
+| `DATABASE_URL`          | your Neon `postgres://…` string                 | required                                                              |
+| `BETTER_AUTH_SECRET`    | 32+ random chars                                | required — rotating it logs everyone out                              |
+| `BETTER_AUTH_URL`       | `https://<your-app>.vercel.app`                 | required — must equal the domain you visit; builds the OAuth callback |
+| `WEB_ORIGIN`            | `https://<your-app>.vercel.app`                 | required — better-auth trusted origin (CSRF); same value as above     |
+| `ALLOWED_EMAIL_DOMAINS` | `thestarterlabs.com` (comma-separated for more) | required — the domain wall for Google sign-in                         |
+| `SUPERADMIN_EMAIL`      | break-glass admin email                         | required                                                              |
+| `SUPERADMIN_PASSWORD`   | break-glass password (12+ chars)                | required                                                              |
+| `GOOGLE_CLIENT_ID`      | Google OAuth client id                          | optional — omit to disable Google, break-glass still works            |
+| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                      | optional                                                              |
+| `VITE_API_URL`          | **empty string** (`""`)                         | build-time; empty = same-origin. **Do not** set it to a URL.          |
+| `NODE_ENV`              | `production`                                    | Vercel sets this automatically                                        |
 
 > `VITE_API_URL` is a **build-time** var (Vite inlines it). Leave it empty so the
 > browser uses relative `/api/...` URLs. If you ever set it to a full URL you'd
