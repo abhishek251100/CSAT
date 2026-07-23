@@ -12,6 +12,9 @@ coverage/
 .env.*
 !.env.example
 
+# Generated Vercel API bundle (built by apps/web/server/build.mjs)
+apps/web/server/handler.bundle.mjs
+
 # Editors / OS
 .DS_Store
 Thumbs.db
