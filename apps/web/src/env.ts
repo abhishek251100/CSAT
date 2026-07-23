@@ -11,16 +11,15 @@ import { z } from 'zod'
  * readable message rather than as a confusing runtime fetch error.
  */
 /**
- * Default API origin, chosen by build mode so a production deploy needs no env
- * var at all:
- *   - production build (`vite build`, e.g. on Vercel): the empty string, so the
- *     browser uses same-origin relative URLs (`/api/...`) — the single-domain
- *     setup. Setting VITE_API_URL to a full origin overrides this for a
- *     split-origin deploy.
- *   - dev (`vite`): the local API on :8787, since the web dev server and API
- *     run on different ports.
+ * Default API origin: the empty string — same-origin relative URLs (`/api/...`),
+ * the single-domain deploy. This is deliberately NOT keyed off
+ * `import.meta.env.PROD`: a build with `NODE_ENV=development` in the environment
+ * (e.g. a stray Vercel env var) flips `PROD` to false, which would silently bake
+ * `http://localhost:8787` into the production bundle. Local dev instead sets
+ * `VITE_API_URL=http://localhost:8787` explicitly in `.env` (see `.env.example`),
+ * which overrides this default; a split-origin deploy sets it to a full origin.
  */
-const defaultApiUrl = import.meta.env.PROD ? '' : 'http://localhost:8787'
+const defaultApiUrl = ''
 
 const clientEnvSchema = z.object({
   /**
