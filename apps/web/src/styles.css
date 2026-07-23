@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/*
+ * Milestone 10 (SPEC.md §10) brings the 3D surfaces, all of which must respect
+ * this. Declared now so the rule is in place before any motion ships.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

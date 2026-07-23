@@ -1,0 +1,43 @@
+{
+  "name": "@zoo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/app.ts",
+    "./router": "./src/routers/_app.ts",
+    "./env": "./src/env.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "auth:seed-admin": "tsx src/seed-admin.ts",
+    "rollups:cron": "tsx src/rollups-cli.ts",
+    "demo:seed": "tsx src/demo-cli.ts seed",
+    "demo:purge": "tsx src/demo-cli.ts purge",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.0.10",
+    "@hono/trpc-server": "0.4.2",
+    "@trpc/server": "11.18.0",
+    "@zoo/db": "workspace:*",
+    "@zoo/shared": "workspace:*",
+    "better-auth": "1.6.23",
+    "drizzle-orm": "0.45.2",
+    "hono": "4.12.31",
+    "superjson": "2.2.6",
+    "uuidv7": "1.2.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.4",
+    "@types/node": "26.1.1",
+    "tsx": "4.23.1",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}

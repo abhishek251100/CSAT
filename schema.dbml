@@ -1,0 +1,467 @@
+// Zoo Media CX Platform — database schema (SPEC.md §4)
+// Paste into https://dbdiagram.io/d to visualise.
+// Generated from the Drizzle schema in packages/db/src/schema.
+//
+// Conventions (§4.1): UUID v7 primary keys; timestamptz created_at/updated_at;
+// soft delete via deleted_at on retention tables; FKs indexed. `is_demo` marks
+// synthetic demo rows removed by `demo:purge`.
+
+// ─────────────────────────────── Enums (§4.2) ───────────────────────────────
+
+Enum role_key {
+  super_admin
+  network_admin
+  agency_admin
+  account_director
+  account_manager
+  team_member
+  viewer
+}
+Enum scope_type {
+  network
+  agency
+  account
+}
+Enum metric_type {
+  csat
+  nps
+}
+Enum survey_source {
+  google_form
+  native
+  import
+}
+Enum question_kind {
+  scale
+  text
+  single_choice
+  multi_choice
+}
+Enum escalation_source {
+  form
+  email
+  call
+  meeting
+  other
+}
+Enum escalation_status {
+  open
+  in_progress
+  resolved
+  closed
+}
+Enum severity {
+  low
+  medium
+  high
+  critical
+}
+Enum rca_subject {
+  escalation
+  dsat_response
+}
+Enum rca_method {
+  five_whys
+  fishbone
+  scatter
+}
+Enum error_category {
+  people
+  process
+  product
+}
+Enum action_status {
+  open
+  in_progress
+  blocked
+  done
+}
+Enum period_grain {
+  monthly
+  quarterly
+  custom
+}
+Enum ai_kind {
+  sentiment
+  theme
+  category_suggestion
+  summary
+}
+Enum account_status {
+  prospect
+  active
+  paused
+  churned
+}
+Enum rca_status {
+  open
+  in_progress
+  closed
+}
+Enum action_source_type {
+  rca
+  escalation
+  standalone
+}
+Enum sync_status {
+  running
+  success
+  partial
+  failed
+}
+Enum action_priority {
+  low
+  medium
+  high
+  urgent
+}
+
+// ───────────────────────── Structure and org (§4.3) ─────────────────────────
+
+Table networks {
+  id uuid [pk]
+  name text [not null]
+  slug text [not null, unique]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table agencies {
+  id uuid [pk]
+  network_id uuid [not null]
+  name text [not null]
+  slug text [not null]
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Indexes {
+    (network_id, slug) [unique]
+    network_id
+  }
+}
+
+Table accounts {
+  id uuid [pk]
+  agency_id uuid [not null]
+  name text [not null]
+  slug text [not null]
+  industry text
+  brand_owner text
+  status account_status [not null, default: 'active']
+  external_form_url text
+  external_sheet_id text
+  external_form_id text
+  csat_cadence period_grain [not null, default: 'monthly']
+  nps_cadence period_grain [not null, default: 'quarterly']
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at timestamptz
+  Indexes {
+    (agency_id, slug) [unique]
+    agency_id
+    status
+  }
+}
+
+// ─────────────────────────── Identity and RBAC (§4.3) ───────────────────────
+
+Table users {
+  id uuid [pk]
+  email text [not null, unique]
+  name text [not null]
+  avatar_url text
+  email_verified boolean [not null, default: false]
+  is_active boolean [not null, default: true]
+  last_login_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+// The single table that drives all visibility (§5.2). scope_id is a SOFT FK:
+// it points at networks / agencies / accounts depending on scope_type, so it is
+// validated in the app, not by a DB constraint.
+Table memberships {
+  id uuid [pk]
+  user_id uuid [not null]
+  scope_type scope_type [not null]
+  scope_id uuid [not null, note: 'soft FK -> networks|agencies|accounts by scope_type']
+  role role_key [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Indexes {
+    (user_id, scope_type, scope_id) [unique]
+    user_id
+    (scope_type, scope_id)
+  }
+}
+
+// Credential tables owned by better-auth. The `user` model is mapped onto the
+// §4.3 users table above (not duplicated).
+Table auth_sessions {
+  id uuid [pk]
+  user_id uuid [not null]
+  token text [not null, unique]
+  expires_at timestamptz [not null]
+  ip_address text
+  user_agent text
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table auth_accounts {
+  id uuid [pk]
+  user_id uuid [not null]
+  account_id text [not null]
+  provider_id text [not null, note: 'google | credential']
+  access_token text
+  refresh_token text
+  id_token text
+  access_token_expires_at timestamptz
+  refresh_token_expires_at timestamptz
+  scope text
+  password text [note: 'hashed; null for social logins']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table auth_verifications {
+  id uuid [pk]
+  identifier text [not null]
+  value text [not null]
+  expires_at timestamptz [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+// ───────────────────────── Surveys and responses (§4.3) ─────────────────────
+
+Table surveys {
+  id uuid [pk]
+  account_id uuid [not null]
+  type metric_type [not null]
+  title text [not null]
+  source survey_source [not null]
+  source_form_id text
+  cadence period_grain [not null]
+  is_active boolean [not null, default: true]
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table survey_questions {
+  id uuid [pk]
+  survey_id uuid [not null]
+  prompt text [not null]
+  kind question_kind [not null]
+  position int [not null]
+  is_required boolean [not null, default: false]
+  created_at timestamptz [not null]
+}
+
+Table survey_responses {
+  id uuid [pk]
+  survey_id uuid [not null]
+  account_id uuid [not null]
+  type metric_type [not null]
+  score smallint [not null, note: 'CSAT 1-5, NPS 0-10; CHECK enforces range per type. DSAT = csat AND score<=3']
+  respondent_name text
+  respondent_email text
+  source survey_source [not null]
+  external_response_id text
+  period_start date
+  period_end date
+  submitted_at timestamptz [not null]
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  deleted_at timestamptz
+  Indexes {
+    (source, external_response_id) [unique, note: 'idempotent Google sync']
+    (account_id, submitted_at)
+    (type, submitted_at)
+  }
+}
+
+Table response_answers {
+  id uuid [pk]
+  response_id uuid [not null]
+  question_id uuid [note: 'SET NULL on question delete']
+  question_label text
+  answer_text text
+  answer_value smallint
+  created_at timestamptz [not null]
+}
+
+// ────────────────────── Escalations, RCA, actions (§4.3, §8) ────────────────
+
+Table escalations {
+  id uuid [pk]
+  account_id uuid [not null]
+  raised_by_user_id uuid
+  source escalation_source [not null]
+  severity severity [not null]
+  title text [not null]
+  description text
+  status escalation_status [not null, default: 'open']
+  reported_at timestamptz [not null]
+  resolved_at timestamptz
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at timestamptz
+}
+
+// One-of subject CHECK (§4.3): exactly one of escalation_id / response_id is
+// set, matching subject_type.
+Table rcas {
+  id uuid [pk]
+  account_id uuid [not null]
+  subject_type rca_subject [not null]
+  escalation_id uuid [note: 'set when subject_type = escalation']
+  response_id uuid [note: 'set when subject_type = dsat_response']
+  method rca_method [not null, note: '5 Whys or fishbone']
+  error_category error_category [note: 'people | process | product; set by a human (§11)']
+  problem_statement text [not null]
+  findings jsonb
+  status rca_status [not null, default: 'open']
+  created_by_user_id uuid
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at timestamptz
+}
+
+// The 5 Whys chain — one row per level.
+Table rca_whys {
+  id uuid [pk]
+  rca_id uuid [not null]
+  level smallint [not null]
+  question text [not null]
+  answer text
+  created_at timestamptz [not null]
+}
+
+// Fishbone branches — bucket + cause.
+Table rca_causes {
+  id uuid [pk]
+  rca_id uuid [not null]
+  bucket text [not null]
+  cause text [not null]
+  created_at timestamptz [not null]
+}
+
+Table action_items {
+  id uuid [pk]
+  account_id uuid [not null]
+  source_type action_source_type [not null, default: 'standalone']
+  rca_id uuid
+  escalation_id uuid
+  title text [not null]
+  description text
+  owner_user_id uuid
+  eta date
+  priority action_priority
+  status action_status [not null, default: 'open']
+  closed_at timestamptz
+  is_demo boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at timestamptz
+}
+
+// ───────────────────────── Aggregation and ops (§4.3) ───────────────────────
+
+// Precomputed metrics; dashboards read this, not raw responses (§12). scope_id
+// is a SOFT FK (network|agency|account by scope_type). value is null for a
+// period with no data (never 0).
+Table metric_rollups {
+  id uuid [pk]
+  scope_type scope_type [not null]
+  scope_id uuid [not null, note: 'soft FK by scope_type']
+  metric text [not null, note: 'csat_percent, nps, dsat_count, csat_score_1..5, nps_promoters/passives/detractors, response_count, escalation_count']
+  period_grain period_grain [not null]
+  period_start date [not null]
+  period_end date [not null]
+  value numeric [note: 'null = no data']
+  sample_size int [not null, default: 0]
+  computed_at timestamptz [not null]
+  created_at timestamptz [not null]
+  Indexes {
+    (scope_type, scope_id, metric, period_grain, period_start) [unique]
+  }
+}
+
+Table sync_runs {
+  id uuid [pk]
+  source survey_source [not null]
+  account_id uuid
+  started_at timestamptz [not null]
+  finished_at timestamptz
+  status sync_status [not null]
+  rows_seen int [not null, default: 0]
+  rows_imported int [not null, default: 0]
+  rows_skipped int [not null, default: 0]
+  error text
+  created_at timestamptz [not null]
+}
+
+// Caches AI output by input_hash so identical input is never re-billed (§11).
+Table ai_analyses {
+  id uuid [pk]
+  entity_type text [not null]
+  entity_id uuid [not null, note: 'soft FK by entity_type']
+  kind ai_kind [not null]
+  model text [not null]
+  input_hash text [not null]
+  output jsonb [not null]
+  created_at timestamptz [not null]
+  Indexes {
+    (entity_type, entity_id, kind, input_hash) [unique]
+  }
+}
+
+Table audit_logs {
+  id uuid [pk]
+  actor_user_id uuid
+  action text [not null]
+  entity_type text [not null]
+  entity_id uuid [not null, note: 'soft FK by entity_type']
+  diff jsonb
+  ip text
+  created_at timestamptz [not null]
+}
+
+// ───────────────────────────── Relationships ───────────────────────────────
+
+Ref: agencies.network_id > networks.id
+Ref: accounts.agency_id > agencies.id
+
+Ref: memberships.user_id > users.id
+Ref: auth_sessions.user_id > users.id
+Ref: auth_accounts.user_id > users.id
+
+Ref: surveys.account_id > accounts.id
+Ref: survey_questions.survey_id > surveys.id
+Ref: survey_responses.survey_id > surveys.id
+Ref: survey_responses.account_id > accounts.id
+Ref: response_answers.response_id > survey_responses.id
+Ref: response_answers.question_id > survey_questions.id
+
+Ref: escalations.account_id > accounts.id
+Ref: escalations.raised_by_user_id > users.id
+
+Ref: rcas.account_id > accounts.id
+Ref: rcas.escalation_id > escalations.id
+Ref: rcas.response_id > survey_responses.id
+Ref: rcas.created_by_user_id > users.id
+Ref: rca_whys.rca_id > rcas.id
+Ref: rca_causes.rca_id > rcas.id
+
+Ref: action_items.account_id > accounts.id
+Ref: action_items.rca_id > rcas.id
+Ref: action_items.escalation_id > escalations.id
+Ref: action_items.owner_user_id > users.id
+
+Ref: sync_runs.account_id > accounts.id
+Ref: audit_logs.actor_user_id > users.id

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.13
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm format:check
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      - run: pnpm test
+
+      - run: pnpm build
+        env:
+          # Build-time only. The web bundle needs an API URL; the real value is
+          # injected per environment at deploy time.
+          VITE_API_URL: http://localhost:8787
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.13
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The Playwright config starts its own servers (the OAuth test API over
+      # in-process Postgres, and Vite). No Neon connection is needed, so this
+      # runs entirely in CI.
+      - run: pnpm --filter @zoo/web exec playwright install --with-deps chromium
+
+      - run: pnpm --filter @zoo/web e2e

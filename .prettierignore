@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+pnpm-lock.yaml
+apps/web/src/routeTree.gen.ts
+packages/db/drizzle/
+
+# Authoritative spec — never reformat, so diffs stay meaningful.
+SPEC.md
+TSL_CX_Dashboard_Build_Spec.md

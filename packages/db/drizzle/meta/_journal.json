@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1784628814922,
+      "tag": "0000_amused_kang",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784628828134,
+      "tag": "0001_updated_at_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784636107816,
+      "tag": "0002_aromatic_star_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784704859163,
+      "tag": "0003_long_sandman",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784798150236,
+      "tag": "0004_glamorous_alice",
+      "breakpoints": true
+    }
+  ]
+}
