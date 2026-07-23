@@ -6,6 +6,7 @@ coverage/
 .vite/
 .vercel/
 
+
 # Env — only .env.example is committed
 .env
 .env.*
