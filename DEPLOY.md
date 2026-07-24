@@ -60,12 +60,16 @@ running half-configured.
 | `SUPERADMIN_PASSWORD`   | break-glass password (12+ chars)                | required                                                              |
 | `GOOGLE_CLIENT_ID`      | Google OAuth client id                          | optional — omit to disable Google, break-glass still works            |
 | `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                      | optional                                                              |
-| `VITE_API_URL`          | **empty string** (`""`)                         | build-time; empty = same-origin. **Do not** set it to a URL.          |
+| `VITE_API_URL`          | **omit entirely**, or empty (`""`)              | build-time; empty = same-origin. **Never** `http://localhost:8787`.   |
 | `NODE_ENV`              | `production`                                    | Vercel sets this automatically                                        |
 
-> `VITE_API_URL` is a **build-time** var (Vite inlines it). Leave it empty so the
-> browser uses relative `/api/...` URLs. If you ever set it to a full URL you'd
-> switch back to a split-origin setup and reintroduce CORS + a second redirect URI.
+> `VITE_API_URL` is a **build-time** var (Vite inlines it into the JS bundle).
+> Leave it unset so the browser uses relative `/api/...` URLs on
+> `csat-web.vercel.app`. If you paste `http://localhost:8787` from local `.env`
+> into Vercel, every sign-in fails with `ERR_CONNECTION_REFUSED` to localhost —
+> then you must clear the var and **Redeploy** (editing env alone does not
+> rebuild the bundle). Setting it to a full production URL would also switch
+> back to a split-origin setup and reintroduce CORS + a second redirect URI.
 
 ## 3. Google Cloud Console (only if using Google SSO)
 
