@@ -14,10 +14,9 @@ https://<your-app>.vercel.app/api/*        -> Hono function         [serverless]
       /api/trpc/*     tRPC
       /api/auth/*     better-auth (Google + break-glass)
 
-The function entry is `apps/web/api/[[...route]].js` (filesystem catch-all). It
-re-exports the esbuild bundle from `server/build.mjs`. Do **not** rewrite
-`/api/*` onto a bare `/api` destination — that can drop the path Hono needs for
-`/api/auth/callback/google`.
+The function entry is `apps/web/api/index.js`. It re-exports the esbuild bundle
+from `server/build.mjs`. `vercel.json` rewrites `/api/(.*) -> /api` so every
+API path hits that one function; Vercel keeps the original URL for Hono.
 ```
 
 The frontend calls the API with **relative** URLs in production (`VITE_API_URL`
@@ -39,10 +38,9 @@ Import this repo in Vercel, then set:
 | **Node.js Version**  | 22.x (matches `engines.node >=22.13`)                                                     |
 
 Vercel reads `packageManager` (`pnpm@10.34.5`) from the root `package.json` and
-uses pnpm automatically. The catch-all at `apps/web/api/[[...route]].js` is the
-serverless function for every `/api` path; `apps/web/vercel.json` only adds the
-SPA fallback rewrite so client-side routes like `/actionables` resolve to
-`index.html` while `/api/*` stays on the function.
+uses pnpm automatically. `apps/web/api/index.js` is the serverless function;
+`vercel.json` rewrites `/api/*` to it and falls other routes back to
+`index.html` for the SPA.
 
 ## 2. Environment variables (Vercel → Project → Settings → Environment Variables)
 
@@ -114,9 +112,11 @@ if Google is disabled), and sign in.
   serverless — no connection pool to manage, no cold-start pool exhaustion.
 - **The Hono app is unchanged** across hosts. `apps/api/src/server.ts` is the
   local Node entry; `apps/web/server/handler.ts` (bundled, re-exported from
-  `apps/web/api/[[...route]].js`) is the Vercel entry. Both call the same
+  `apps/web/api/index.js`) is the Vercel entry. Both call the same
   `createApp(env)` — swapping hosts replaces the entry file, not the app
   (SPEC.md §16 #6).
+- **Deploy only `apps/web`.** Do not create a second Vercel project for
+  `apps/api` — the API ships as the serverless function inside the web project.
 - **Demo data** (`demo:seed`/`demo:purge`) is a CLI you run from your machine
   against `DATABASE_URL`; it is not part of the deployment and refuses to run
   under `NODE_ENV=production`.

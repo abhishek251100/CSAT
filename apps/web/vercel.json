@@ -3,7 +3,14 @@
   "framework": "vite",
   "buildCommand": "vite build && node server/build.mjs",
   "outputDirectory": "dist",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "server/handler.bundle.mjs",
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/((?!api(?:/|$)).*)", "destination": "/index.html" }
   ]
 }
