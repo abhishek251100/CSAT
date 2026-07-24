@@ -1,4 +1,3 @@
-import { getRequestListener } from '@hono/node-server'
 import { createApp } from '@zoo/api'
 import { parseServerEnv } from '@zoo/api/env'
 
@@ -11,10 +10,16 @@ import { parseServerEnv } from '@zoo/api/env'
  * re-exports that bundle. So the deployed function has no workspace or `.ts`
  * imports left to resolve.
  *
- * Uses `@hono/node-server`'s `getRequestListener` — Vercel's `/api` Node
- * runtime invokes `(req, res)`, not a Web `Request`. Hono's `hono/vercel`
- * `handle()` expects a Web Request and hangs under the Node signature, which
- * surfaces as 504 FUNCTION_INVOCATION_TIMEOUT on every `/api/*` call.
+ * Export shape matters on Vercel Node:
+ *   - A single-arg `(request: Request) => Response` is the Web Handler form.
+ *     Vercel builds a real Web `Request` with the POST body already attached.
+ *   - `@hono/node-server`'s `getRequestListener` is the classic `(req, res)`
+ *     form. GET works, but POST hangs forever on Vercel because the platform
+ *     has already buffered `req.body` and the IncomingMessage stream never
+ *     ends the way Node's http.Server would — that is the 504 on
+ *     `/api/auth/sign-in/*`.
+ *   - `hono/vercel`'s `handle()` is also a Web Handler, but exporting an
+ *     explicit named async function is the clearest signal to the runtime.
  *
  * `vercel.json` rewrites `/api/*` onto this one function; Vercel keeps the
  * original request URL, so Hono still sees `/api/auth/*` and `/api/trpc/*`.
@@ -25,4 +30,6 @@ import { parseServerEnv } from '@zoo/api/env'
  */
 const app = createApp(parseServerEnv(process.env))
 
-export default getRequestListener(app.fetch)
+export default async function handler(request: Request): Promise<Response> {
+  return app.fetch(request)
+}
