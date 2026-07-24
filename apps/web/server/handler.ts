@@ -1,4 +1,4 @@
-import { handle } from 'hono/vercel'
+import { getRequestListener } from '@hono/node-server'
 import { createApp } from '@zoo/api'
 import { parseServerEnv } from '@zoo/api/env'
 
@@ -11,9 +11,13 @@ import { parseServerEnv } from '@zoo/api/env'
  * re-exports that bundle. So the deployed function has no workspace or `.ts`
  * imports left to resolve.
  *
- * Uses Hono's Vercel adapter (`handle`) which accepts the Web `Request` Vercel
- * passes through. `vercel.json` rewrites `/api/*` onto this one function; Vercel
- * keeps the original request URL, so Hono still sees `/api/auth/*` and `/api/trpc/*`.
+ * Uses `@hono/node-server`'s `getRequestListener` — Vercel's `/api` Node
+ * runtime invokes `(req, res)`, not a Web `Request`. Hono's `hono/vercel`
+ * `handle()` expects a Web Request and hangs under the Node signature, which
+ * surfaces as 504 FUNCTION_INVOCATION_TIMEOUT on every `/api/*` call.
+ *
+ * `vercel.json` rewrites `/api/*` onto this one function; Vercel keeps the
+ * original request URL, so Hono still sees `/api/auth/*` and `/api/trpc/*`.
  *
  * Built once at module scope and reused across warm invocations. Env comes from
  * Vercel project settings via `process.env`; a missing required var throws here
@@ -21,4 +25,4 @@ import { parseServerEnv } from '@zoo/api/env'
  */
 const app = createApp(parseServerEnv(process.env))
 
-export default handle(app)
+export default getRequestListener(app.fetch)

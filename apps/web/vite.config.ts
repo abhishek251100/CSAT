@@ -11,7 +11,7 @@ import { defineConfig, loadEnv } from 'vite'
  * every sign-in shows "Could not reach the API". Same-origin (empty string) is
  * the single-domain contract — see DEPLOY.md.
  */
-function sanitizeApiUrlForBuild(mode: string, env: Record<string, string>) {
+function sanitizeApiUrlForBuild(mode: string, env: Record<string, string | undefined>) {
   const raw = (env.VITE_API_URL ?? '').trim()
   const onVercel = process.env.VERCEL === '1'
   const isProdBuild = mode === 'production'
@@ -32,6 +32,7 @@ function sanitizeApiUrlForBuild(mode: string, env: Record<string, string>) {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, fileURLToPath(new URL('../..', import.meta.url)), '')
+  // process.env values are `string | undefined`; the sanitizer accepts that.
   sanitizeApiUrlForBuild(mode, { ...env, ...process.env })
 
   return {
