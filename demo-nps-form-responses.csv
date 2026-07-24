@@ -1,0 +1,131 @@
+Timestamp,Agency,Account,How likely are you to recommend us to a colleague or peer?,NPS band
+2026-04-12,Demo Agency,Aurora Foods,9,promoter
+2026-04-12,Demo Agency,Aurora Foods,8,passive
+2026-04-12,Demo Agency,Aurora Foods,10,promoter
+2026-04-12,Demo Agency,Aurora Foods,9,promoter
+2026-04-12,Demo Agency,Aurora Foods,7,passive
+2026-07-12,Demo Agency,Aurora Foods,10,promoter
+2026-07-12,Demo Agency,Aurora Foods,9,promoter
+2026-07-12,Demo Agency,Aurora Foods,8,passive
+2026-07-12,Demo Agency,Aurora Foods,10,promoter
+2026-07-12,Demo Agency,Aurora Foods,9,promoter
+2026-04-12,Demo Agency,Borealis Bank,6,detractor
+2026-04-12,Demo Agency,Borealis Bank,2,detractor
+2026-04-12,Demo Agency,Borealis Bank,5,detractor
+2026-04-12,Demo Agency,Borealis Bank,4,detractor
+2026-04-12,Demo Agency,Borealis Bank,0,detractor
+2026-07-12,Demo Agency,Borealis Bank,3,detractor
+2026-07-12,Demo Agency,Borealis Bank,6,detractor
+2026-07-12,Demo Agency,Borealis Bank,2,detractor
+2026-07-12,Demo Agency,Borealis Bank,5,detractor
+2026-07-12,Demo Agency,Borealis Bank,4,detractor
+2026-04-12,Demo Agency,Cirrus Tech,8,passive
+2026-04-12,Demo Agency,Cirrus Tech,10,promoter
+2026-04-12,Demo Agency,Cirrus Tech,3,detractor
+2026-04-12,Demo Agency,Cirrus Tech,9,promoter
+2026-04-12,Demo Agency,Cirrus Tech,7,passive
+2026-07-12,Demo Agency,Cirrus Tech,6,detractor
+2026-07-12,Demo Agency,Cirrus Tech,8,passive
+2026-07-12,Demo Agency,Cirrus Tech,10,promoter
+2026-07-12,Demo Agency,Cirrus Tech,3,detractor
+2026-07-12,Demo Agency,Cirrus Tech,9,promoter
+2026-04-12,Demo Agency,Delta Retail,9,promoter
+2026-04-12,Demo Agency,Delta Retail,7,passive
+2026-04-12,Demo Agency,Delta Retail,10,promoter
+2026-04-12,Demo Agency,Delta Retail,9,promoter
+2026-04-12,Demo Agency,Delta Retail,8,passive
+2026-07-12,Demo Agency,Delta Retail,10,promoter
+2026-07-12,Demo Agency,Delta Retail,9,promoter
+2026-07-12,Demo Agency,Delta Retail,7,passive
+2026-07-12,Demo Agency,Delta Retail,10,promoter
+2026-07-12,Demo Agency,Delta Retail,9,promoter
+2026-04-12,Demo Agency,Everest Media,4,detractor
+2026-04-12,Demo Agency,Everest Media,0,detractor
+2026-04-12,Demo Agency,Everest Media,3,detractor
+2026-04-12,Demo Agency,Everest Media,6,detractor
+2026-04-12,Demo Agency,Everest Media,2,detractor
+2026-07-12,Demo Agency,Everest Media,5,detractor
+2026-07-12,Demo Agency,Everest Media,4,detractor
+2026-07-12,Demo Agency,Everest Media,0,detractor
+2026-07-12,Demo Agency,Everest Media,3,detractor
+2026-07-12,Demo Agency,Everest Media,6,detractor
+2026-04-12,The Starter Labs,Mogu Mogu,10,promoter
+2026-04-12,The Starter Labs,Mogu Mogu,9,promoter
+2026-04-12,The Starter Labs,Mogu Mogu,8,passive
+2026-04-12,The Starter Labs,Mogu Mogu,10,promoter
+2026-04-12,The Starter Labs,Mogu Mogu,9,promoter
+2026-07-12,The Starter Labs,Mogu Mogu,7,passive
+2026-07-12,The Starter Labs,Mogu Mogu,10,promoter
+2026-07-12,The Starter Labs,Mogu Mogu,9,promoter
+2026-07-12,The Starter Labs,Mogu Mogu,8,passive
+2026-07-12,The Starter Labs,Mogu Mogu,10,promoter
+2026-04-12,The Starter Labs,Chemistry,3,detractor
+2026-04-12,The Starter Labs,Chemistry,6,detractor
+2026-04-12,The Starter Labs,Chemistry,2,detractor
+2026-04-12,The Starter Labs,Chemistry,5,detractor
+2026-04-12,The Starter Labs,Chemistry,4,detractor
+2026-07-12,The Starter Labs,Chemistry,0,detractor
+2026-07-12,The Starter Labs,Chemistry,3,detractor
+2026-07-12,The Starter Labs,Chemistry,6,detractor
+2026-07-12,The Starter Labs,Chemistry,2,detractor
+2026-07-12,The Starter Labs,Chemistry,5,detractor
+2026-04-12,The Starter Labs,Inkspired,6,detractor
+2026-04-12,The Starter Labs,Inkspired,8,passive
+2026-04-12,The Starter Labs,Inkspired,10,promoter
+2026-04-12,The Starter Labs,Inkspired,3,detractor
+2026-04-12,The Starter Labs,Inkspired,9,promoter
+2026-07-12,The Starter Labs,Inkspired,7,passive
+2026-07-12,The Starter Labs,Inkspired,6,detractor
+2026-07-12,The Starter Labs,Inkspired,8,passive
+2026-07-12,The Starter Labs,Inkspired,10,promoter
+2026-07-12,The Starter Labs,Inkspired,3,detractor
+2026-04-12,The Starter Labs,SOA,2,detractor
+2026-04-12,The Starter Labs,SOA,5,detractor
+2026-04-12,The Starter Labs,SOA,4,detractor
+2026-04-12,The Starter Labs,SOA,0,detractor
+2026-04-12,The Starter Labs,SOA,3,detractor
+2026-07-12,The Starter Labs,SOA,6,detractor
+2026-07-12,The Starter Labs,SOA,2,detractor
+2026-07-12,The Starter Labs,SOA,5,detractor
+2026-07-12,The Starter Labs,SOA,4,detractor
+2026-07-12,The Starter Labs,SOA,0,detractor
+2026-04-12,The Starter Labs,The Croffle Guys,9,promoter
+2026-04-12,The Starter Labs,The Croffle Guys,7,passive
+2026-04-12,The Starter Labs,The Croffle Guys,10,promoter
+2026-04-12,The Starter Labs,The Croffle Guys,9,promoter
+2026-04-12,The Starter Labs,The Croffle Guys,8,passive
+2026-07-12,The Starter Labs,The Croffle Guys,10,promoter
+2026-07-12,The Starter Labs,The Croffle Guys,9,promoter
+2026-07-12,The Starter Labs,The Croffle Guys,7,passive
+2026-07-12,The Starter Labs,The Croffle Guys,10,promoter
+2026-07-12,The Starter Labs,The Croffle Guys,9,promoter
+2026-04-12,The Starter Labs,Anemos,3,detractor
+2026-04-12,The Starter Labs,Anemos,9,promoter
+2026-04-12,The Starter Labs,Anemos,7,passive
+2026-04-12,The Starter Labs,Anemos,6,detractor
+2026-04-12,The Starter Labs,Anemos,8,passive
+2026-07-12,The Starter Labs,Anemos,10,promoter
+2026-07-12,The Starter Labs,Anemos,3,detractor
+2026-07-12,The Starter Labs,Anemos,9,promoter
+2026-07-12,The Starter Labs,Anemos,7,passive
+2026-07-12,The Starter Labs,Anemos,6,detractor
+2026-04-12,The Starter Labs,WhiteOak,10,promoter
+2026-04-12,The Starter Labs,WhiteOak,9,promoter
+2026-04-12,The Starter Labs,WhiteOak,8,passive
+2026-04-12,The Starter Labs,WhiteOak,10,promoter
+2026-04-12,The Starter Labs,WhiteOak,9,promoter
+2026-07-12,The Starter Labs,WhiteOak,7,passive
+2026-07-12,The Starter Labs,WhiteOak,10,promoter
+2026-07-12,The Starter Labs,WhiteOak,9,promoter
+2026-07-12,The Starter Labs,WhiteOak,8,passive
+2026-07-12,The Starter Labs,WhiteOak,10,promoter
+2026-04-12,The Starter Labs,BuildWell,3,detractor
+2026-04-12,The Starter Labs,BuildWell,6,detractor
+2026-04-12,The Starter Labs,BuildWell,2,detractor
+2026-04-12,The Starter Labs,BuildWell,5,detractor
+2026-04-12,The Starter Labs,BuildWell,4,detractor
+2026-07-12,The Starter Labs,BuildWell,0,detractor
+2026-07-12,The Starter Labs,BuildWell,3,detractor
+2026-07-12,The Starter Labs,BuildWell,6,detractor
+2026-07-12,The Starter Labs,BuildWell,2,detractor
+2026-07-12,The Starter Labs,BuildWell,5,detractor
