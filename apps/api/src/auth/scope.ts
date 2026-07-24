@@ -2,42 +2,33 @@ import type { AppDb } from '@zoo/db'
 import { accounts, agencies, memberships } from '@zoo/db/schema'
 import {
   can,
+  GLOBAL_SCOPE_ID,
   resolveVisibleAccountIds,
   type RoleKey,
   type ScopeMembership,
   type ScopeType,
+  type ViewScopeType,
 } from '@zoo/shared'
 import { TRPCError } from '@trpc/server'
 import { and, eq, isNull } from 'drizzle-orm'
 
 /**
- * Database-backed scope resolution — SPEC.md §5.2.
- *
- * The rules themselves live in @zoo/shared (`resolveVisibleAccountIds`), pure
- * and exhaustively unit-tested. This module only loads the rows they need, so
- * there is exactly one definition of who can see what.
+ * Database-backed scope resolution — SPEC.md §5.2 + Global virtual scope.
  */
 
-/**
- * Resolves the accounts behind a requested scope, refusing anything the caller
- * cannot see in full — SPEC.md §5.2, §5.3, §12.
- *
- * The rule for aggregate tiers is *total* visibility, not partial: an agency
- * rollup pools every account in that agency, so someone who can see one of them
- * must not be able to read it. Doing otherwise would leak the other accounts'
- * numbers in aggregate form, which is exactly the isolation §5.3 depends on.
- *
- * Throws NOT_FOUND rather than FORBIDDEN, for the same reason as
- * `assertAccountInScope`: FORBIDDEN would confirm the scope exists to someone
- * outside it.
- */
 export async function resolveScopeAccounts(
   db: AppDb,
   session: { visibleAccountIds: readonly string[]; canViewNetwork: boolean },
-  scopeType: ScopeType,
+  scopeType: ViewScopeType | ScopeType,
   scopeId: string,
 ): Promise<string[]> {
   const visible = new Set(session.visibleAccountIds)
+
+  if (scopeType === 'global') {
+    if (scopeId !== GLOBAL_SCOPE_ID) throw notFound()
+    if (visible.size === 0) throw notFound()
+    return [...visible]
+  }
 
   if (scopeType === 'account') {
     if (!visible.has(scopeId)) throw notFound()
@@ -54,11 +45,6 @@ export async function resolveScopeAccounts(
     return assertAllVisible(rows, visible)
   }
 
-  /**
-   * §5.3 restricts the network-level view to super_admin and network_admin, and
-   * it is checked here as well as by capability: the membership must actually
-   * be at network tier (see `canViewNetwork` below).
-   */
   if (!session.canViewNetwork) throw notFound()
 
   const rows = await db

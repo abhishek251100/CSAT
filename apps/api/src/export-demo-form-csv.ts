@@ -23,11 +23,18 @@ const REAL_ACCOUNTS = [
   { name: 'Mogu Mogu', agency: 'The Starter Labs', profile: 'healthy' as Profile },
   { name: 'Chemistry', agency: 'The Starter Labs', profile: 'struggling' as Profile },
   { name: 'Inkspired', agency: 'The Starter Labs', profile: 'middling' as Profile },
-  { name: 'SOA', agency: 'The Starter Labs', profile: 'struggling' as Profile },
+  { name: 'SOA', agency: 'The Starter Labs', profile: 'middling' as Profile },
   { name: 'The Croffle Guys', agency: 'The Starter Labs', profile: 'healthy' as Profile },
-  { name: 'Anemos', agency: 'The Starter Labs', profile: 'middling' as Profile },
+  { name: 'Anemos', agency: 'The Starter Labs', profile: 'healthy' as Profile },
   { name: 'WhiteOak', agency: 'The Starter Labs', profile: 'healthy' as Profile },
-  { name: 'BuildWell', agency: 'The Starter Labs', profile: 'struggling' as Profile },
+  { name: 'BuildWell', agency: 'The Starter Labs', profile: 'middling' as Profile },
+]
+
+const FOXY_ACCOUNTS = [
+  { name: 'Foxy Retail Co', agency: 'Foxy', profile: 'struggling' as Profile },
+  { name: 'Foxy Hospitality', agency: 'Foxy', profile: 'struggling' as Profile },
+  { name: 'Foxy Fintech', agency: 'Foxy', profile: 'middling' as Profile },
+  { name: 'Foxy Health', agency: 'Foxy', profile: 'struggling' as Profile },
 ]
 
 const CSAT_HEADERS = [
@@ -120,7 +127,7 @@ function isoDate(d: Date): string {
 /** Match the demo seed test anchor so the export is stable and reviewable. */
 const NOW = new Date('2026-07-23T12:00:00.000Z')
 
-const targets = [...DEMO_ACCOUNTS, ...REAL_ACCOUNTS]
+const targets = [...DEMO_ACCOUNTS, ...REAL_ACCOUNTS, ...FOXY_ACCOUNTS]
 const csatRows: string[] = [CSAT_HEADERS.map(csvEscape).join(',')]
 const npsRows: string[] = [NPS_HEADERS.map(csvEscape).join(',')]
 

@@ -1,3 +1,4 @@
+import { brandHealthFromCsat, BRAND_HEALTH_LABEL } from '@zoo/shared'
 import { formatMetric, NPS_BAND_LABEL } from '../lib/chart-theme'
 
 export interface LeaderboardRow {
@@ -13,17 +14,7 @@ export interface LeaderboardRow {
 type SortKey = 'name' | 'csatPercent' | 'nps' | 'responseCount'
 
 /**
- * Account leaderboard — SPEC.md §9: "at agency/network scope: account
- * leaderboard table (account, CSAT %, NPS, responses, trend) sortable, with
- * drill-down to the account view."
- *
- * Doubles as the table fallback §12 requires for the charts above it: every
- * figure on this page is also readable as text, so nothing depends on reading a
- * colour or a chart.
- *
- * Accounts with no responses sort last regardless of direction — a null is
- * "unknown", and letting it win a "best CSAT" sort would be actively
- * misleading.
+ * Brand-level overall scores — CSAT %, NPS, responses, health badge.
  */
 export function Leaderboard({
   rows,
@@ -46,7 +37,6 @@ export function Leaderboard({
     const a = left[sortKey]
     const b = right[sortKey]
 
-    // Nulls always sink, so "no data" never tops a ranking.
     if (a === null && b === null) return 0
     if (a === null) return 1
     if (b === null) return -1
@@ -56,13 +46,13 @@ export function Leaderboard({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[36rem] text-left text-sm">
+      <table className="w-full min-w-[40rem] text-left text-sm">
         <caption className="sr-only">
-          Accounts in the selected scope with CSAT, NPS and response counts for the period
+          Brands in the selected scope with CSAT, NPS, response counts and health
         </caption>
         <thead>
           <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase">
-            <SortableHeader label="Account" column="name" {...{ sortKey, descending, onSort }} />
+            <SortableHeader label="Brand" column="name" {...{ sortKey, descending, onSort }} />
             <SortableHeader
               label="CSAT %"
               column="csatPercent"
@@ -83,39 +73,58 @@ export function Leaderboard({
               {...{ sortKey, descending, onSort }}
             />
             <th className="px-3 py-2 text-right font-medium">DSAT</th>
+            <th className="px-3 py-2 font-medium">Health</th>
           </tr>
         </thead>
         <tbody>
-          {sorted.map((row) => (
-            <tr key={row.accountId} className="border-b border-slate-800/60 hover:bg-slate-800/40">
-              <td className="px-3 py-2">
-                <button
-                  type="button"
-                  onClick={() => onDrillDown(row.accountId)}
-                  className="text-slate-100 underline-offset-4 hover:underline"
-                >
-                  {row.name}
-                </button>
-              </td>
-              <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
-                {formatMetric(row.csatPercent, { suffix: '%' })}
-              </td>
-              <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
-                {formatMetric(row.nps)}
-              </td>
-              <td className="px-3 py-2 text-xs text-slate-400">
-                {row.npsBand ? (NPS_BAND_LABEL[row.npsBand] ?? row.npsBand) : '—'}
-              </td>
-              <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
-                {row.responseCount}
-              </td>
-              <td className="px-3 py-2 text-right text-slate-200 tabular-nums">{row.dsatCount}</td>
-            </tr>
-          ))}
+          {sorted.map((row) => {
+            const health = brandHealthFromCsat(row.csatPercent)
+            const healthClass =
+              health === 'good'
+                ? 'text-emerald-300'
+                : health === 'watch'
+                  ? 'text-amber-300'
+                  : health === 'poor'
+                    ? 'text-rose-300'
+                    : 'text-slate-500'
+
+            return (
+              <tr
+                key={row.accountId}
+                className="border-b border-slate-800/60 hover:bg-slate-800/40"
+              >
+                <td className="px-3 py-2">
+                  <button
+                    type="button"
+                    onClick={() => onDrillDown(row.accountId)}
+                    className="text-slate-100 underline-offset-4 hover:underline"
+                  >
+                    {row.name}
+                  </button>
+                </td>
+                <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
+                  {formatMetric(row.csatPercent, { suffix: '%' })}
+                </td>
+                <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
+                  {formatMetric(row.nps)}
+                </td>
+                <td className="px-3 py-2 text-xs text-slate-400">
+                  {row.npsBand ? (NPS_BAND_LABEL[row.npsBand] ?? row.npsBand) : '—'}
+                </td>
+                <td className="px-3 py-2 text-right text-slate-200 tabular-nums">
+                  {row.responseCount}
+                </td>
+                <td className="px-3 py-2 text-right text-slate-200 tabular-nums">{row.dsatCount}</td>
+                <td className={`px-3 py-2 text-xs font-medium ${healthClass}`}>
+                  {BRAND_HEALTH_LABEL[health]}
+                </td>
+              </tr>
+            )
+          })}
           {sorted.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-3 py-6 text-center text-sm text-slate-500">
-                No accounts in this scope.
+              <td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-500">
+                No brands in this scope.
               </td>
             </tr>
           )}

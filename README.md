@@ -5,20 +5,22 @@ Internal Customer Experience analytics and workflow platform for the Zoo Media a
 **[SPEC.md](SPEC.md) is authoritative.** Sections 4 (DB schema), 5 (RBAC), and 6 (metric formulas) are
 non-negotiable contracts. Build order is Section 14.
 
+**Guides:** [USER_GUIDE.md](USER_GUIDE.md) (operators) · [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) (engineering) · [DEMO_DATA.md](DEMO_DATA.md)
+
 ## Status
 
-Milestone 7 of 12 complete — views 1 and 2 both live. Ships 1–7 are the usable core (§14).
+Milestone 7 of 12 complete — core views live; delivery overhaul adds Global scope, Foxy agency, three tabs (CX metrics / DSAT / A tracker), Access admin, and sticky filters.
 
 1. ✅ Repo scaffold, end-to-end type flow, Zod-validated env, CI.
 2. ✅ DB schema + migrations + enums + seed (§4, §13); metric functions in `packages/shared` (§6).
 3. ✅ better-auth + memberships + scope resolver + tRPC auth/scope middleware (§5).
 4. ✅ Manual response entry + `metric_rollups` recompute, on write and on a schedule (§4.3, §6).
-5. ✅ View 1 — Customer Satisfaction and Loyalty, served from rollups (§9).
+5. ✅ CX metrics (formerly View 1) — rollups, Global/Network/Agency/Account, brand health (§9).
 6. ✅ Escalations → RCA (5 Whys, fishbone, error category) → action items; DSAT-triggers-RCA (§8).
-7. ✅ View 2 — Customer Feedback and Actionables, from the §8 routers and rollups (§9).
+7. ✅ DSAT + A tracker tabs + Access (membership) admin.
 8. ⬜ Google Sheets sync with per-account column mapping (§7.1).
 
-Migrations are applied to Neon and the org hierarchy is seeded: 1 network, 1 agency, 16 accounts.
+Migrations are applied to Neon and the org hierarchy is seeded: 1 network (Zoo Media), agencies (The Starter Labs + Foxy + demo), TSL + Foxy accounts.
 
 ## Authentication (§5, §16 #4)
 

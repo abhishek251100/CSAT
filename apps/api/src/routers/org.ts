@@ -24,7 +24,7 @@ export const orgRouter = router({
     const visible = new Set(ctx.session.visibleAccountIds)
 
     if (visible.size === 0) {
-      return { networks: [], agencies: [], accounts: [] }
+      return { global: false, networks: [], agencies: [], accounts: [] }
     }
 
     const rows = await ctx.db
@@ -44,7 +44,11 @@ export const orgRouter = router({
 
     const accountOptions = rows
       .filter((row) => visible.has(row.accountId))
-      .map((row) => ({ id: row.accountId, name: row.accountName, agencyId: row.agencyId }))
+      .map((row) => ({
+        id: row.accountId,
+        name: row.accountName,
+        agencyId: row.agencyId,
+      }))
 
     const fullyVisible = (predicate: (row: (typeof rows)[number]) => boolean) =>
       rows.filter(predicate).every((row) => visible.has(row.accountId)) && rows.some(predicate)
@@ -60,7 +64,13 @@ export const orgRouter = router({
           .filter((network) => fullyVisible((row) => row.networkId === network.networkId))
           .map((network) => ({ id: network.networkId, name: network.networkName }))
 
-    return { networks: networkOptions, agencies: agencyOptions, accounts: accountOptions }
+    /** Global is offered whenever the caller can see at least one account. */
+    return {
+      global: true,
+      networks: networkOptions,
+      agencies: agencyOptions,
+      accounts: accountOptions,
+    }
   }),
 
   /**

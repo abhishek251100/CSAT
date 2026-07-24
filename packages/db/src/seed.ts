@@ -29,7 +29,7 @@ async function main() {
   const summary = await seedOrg(createDb(databaseUrl))
 
   console.log(`[seed] network:  ${summary.networkName}`)
-  console.log(`[seed] agency:   ${summary.agencyName}`)
+  console.log(`[seed] agencies: ${summary.agencyNames.join(', ')}`)
   console.log(`[seed] accounts: ${summary.accountCount} upserted`)
   console.log(`[seed]           ${summary.withFormId} with a resolved external_form_id`)
   console.log(`[seed]           ${summary.sheetBacked} Sheet-backed`)

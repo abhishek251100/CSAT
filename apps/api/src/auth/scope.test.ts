@@ -336,3 +336,32 @@ describe('capabilities reported to the client (§5.3)', () => {
     expect(me.capabilities).toContain('platform_config')
   })
 })
+
+describe('Global virtual scope', () => {
+  it('offers global in scopeOptions when the caller can see accounts', async () => {
+    const options = await (await callerFor('networkAdmin')).org.scopeOptions()
+
+    expect(options.global).toBe(true)
+    expect(options.agencies.map((row) => row.name).sort()).toEqual([
+      'Sibling Agency',
+      'The Starter Labs',
+    ])
+  })
+
+  it('pools every visible account for network admins', async () => {
+    const { resolveScopeAccounts } = await import('./scope')
+    const session = (await contextFor('networkAdmin')).session!
+    const idsResolved = await resolveScopeAccounts(db, session, 'global', 'global')
+
+    expect(idsResolved.sort()).toEqual([ids.chemistry, ids.inkspired, ids.mogu].sort())
+  })
+
+  it('still respects agency isolation under global', async () => {
+    const { resolveScopeAccounts } = await import('./scope')
+    const session = (await contextFor('agencyAdmin')).session!
+    const idsResolved = await resolveScopeAccounts(db, session, 'global', 'global')
+
+    expect(idsResolved.sort()).toEqual([ids.chemistry, ids.mogu].sort())
+    expect(idsResolved).not.toContain(ids.inkspired)
+  })
+})

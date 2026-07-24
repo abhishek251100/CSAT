@@ -1,23 +1,19 @@
-export type ScopeType = 'network' | 'agency' | 'account'
+import { GLOBAL_SCOPE_ID, type ViewScopeType } from '@zoo/shared'
+import type { ReactNode } from 'react'
+
+export type ScopeType = ViewScopeType
 export type Grain = 'monthly' | 'quarterly' | 'custom'
 
 export interface ScopeOptions {
+  global?: boolean
   networks: { id: string; name: string }[]
   agencies: { id: string; name: string }[]
-  /** `agencyId` lets View 2 narrow the account set to the selected agency. */
   accounts: { id: string; name: string; agencyId: string }[]
 }
 
 /**
- * Global controls — SPEC.md §9: "scope switch (Network / Agency / Account),
- * account or agency picker (options limited by RBAC scope), period grain
- * (Monthly / Quarterly / Custom), date range."
- *
- * The picker is populated from `org.scopeOptions`, which derives its list from
- * `resolveVisibleAccounts` — so a scope the server would refuse is never
- * offered. A tier with no options is disabled rather than hidden, so the
- * hierarchy stays legible: an account manager can see that network and agency
- * views exist without being able to select them.
+ * Global controls — scope switch (Global / Network / Agency / Account),
+ * entity picker, period grain, date range, plus sticky period chip support.
  */
 export function ViewControls({
   options,
@@ -42,10 +38,15 @@ export function ViewControls({
     to?: string
   }) => void
 }) {
-  const optionsFor = (tier: ScopeType) =>
-    tier === 'network' ? options.networks : tier === 'agency' ? options.agencies : options.accounts
+  const optionsFor = (tier: ScopeType) => {
+    if (tier === 'global') return [{ id: GLOBAL_SCOPE_ID, name: 'All visible accounts' }]
+    if (tier === 'network') return options.networks
+    if (tier === 'agency') return options.agencies
+    return options.accounts
+  }
 
   const current = optionsFor(scopeType)
+  const globalEnabled = options.global !== false && (options.accounts.length > 0 || options.global)
 
   return (
     <section
@@ -58,13 +59,13 @@ export function ViewControls({
           onChange={(event) => {
             const nextTier = event.target.value as ScopeType
             const first = optionsFor(nextTier)[0]
-
-            // Move the selection with the tier; an empty tier keeps the id blank
-            // and the dashboard renders its empty state rather than querying.
             onChange({ scopeType: nextTier, scopeId: first?.id ?? '' })
           }}
           className={selectClass}
         >
+          <option value="global" disabled={!globalEnabled}>
+            Global
+          </option>
           <option value="network" disabled={options.networks.length === 0}>
             Network
           </option>
@@ -72,13 +73,21 @@ export function ViewControls({
             Agency
           </option>
           <option value="account" disabled={options.accounts.length === 0}>
-            Account
+            Account / Brand
           </option>
         </select>
       </Field>
 
       <Field
-        label={scopeType === 'account' ? 'Account' : scopeType === 'agency' ? 'Agency' : 'Network'}
+        label={
+          scopeType === 'account'
+            ? 'Brand'
+            : scopeType === 'agency'
+              ? 'Agency'
+              : scopeType === 'network'
+                ? 'Network'
+                : 'Coverage'
+        }
       >
         <select
           value={scopeId}
@@ -128,10 +137,34 @@ export function ViewControls({
   )
 }
 
+export function PeriodChip({
+  scopeLabel,
+  entityLabel,
+  grain,
+  from,
+  to,
+}: {
+  scopeLabel: string
+  entityLabel: string
+  grain: Grain
+  from: string
+  to: string
+}) {
+  return (
+    <p
+      className="sticky top-0 z-20 border-b border-sky-900/60 bg-slate-950/95 px-1 py-2 text-sm text-sky-100 backdrop-blur"
+      role="status"
+    >
+      <span className="font-medium text-sky-300">Viewing:</span> {scopeLabel}
+      {entityLabel ? ` · ${entityLabel}` : ''} · {grain} · {from} → {to}
+    </p>
+  )
+}
+
 const selectClass =
   'rounded-md border border-slate-700 bg-slate-950 px-3 py-1.5 text-sm text-slate-100 disabled:opacity-50'
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-xs text-slate-400">{label}</span>

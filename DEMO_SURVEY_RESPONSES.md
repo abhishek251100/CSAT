@@ -6,8 +6,8 @@ This is the **dummy client survey data** behind the dashboard — shaped like yo
 
 | File | What it is |
 |------|------------|
-| [`demo-csat-form-responses.csv`](demo-csat-form-responses.csv) | **583** CSAT form responses (all 6 scores + optional comment) |
-| [`demo-nps-form-responses.csv`](demo-nps-form-responses.csv) | **130** NPS responses (separate instrument) |
+| [`demo-csat-form-responses.csv`](demo-csat-form-responses.csv) | **763** CSAT form responses (TSL + Foxy + Demo Agency) |
+| [`demo-nps-form-responses.csv`](demo-nps-form-responses.csv) | **170** NPS responses (separate instrument) |
 | [`demo-data-summary.csv`](demo-data-summary.csv) | Per-account totals (responses / escalations / RCAs / actions) |
 
 Regenerate after changing seed logic:
@@ -53,9 +53,13 @@ Aurora Foods, Borealis Bank, Cirrus Tech, Delta Retail, Everest Media
 ### The Starter Labs (real client names + demo answers)
 Mogu Mogu, Chemistry, Inkspired, SOA, The Croffle Guys, Anemos, WhiteOak, BuildWell
 
+### Foxy (real agency + demo answers — mostly struggling)
+Foxy Retail Co, Foxy Hospitality, Foxy Fintech, Foxy Health
+
 ### Real TSL accounts with **no** demo responses (0 form rows)
 AJ, Alka Seltzer, EPCH, HyKr Venture Studio, Ryan, Spunge, Standard Chartered, Sunteck
 
+**Global** scope in the UI pools every account you can see (TSL + Foxy + Demo Agency when seeded and granted).
 ---
 
 ## Sample rows (what one “form fill” looks like)
@@ -72,7 +76,7 @@ AJ, Alka Seltzer, EPCH, HyKr Venture Studio, Ryan, Spunge, Standard Chartered, S
 |-----------|-------|------|
 | 2026-04-12 | 9 | promoter |
 
-Open the CSVs in Excel/Sheets for the full ~713 rows.
+Open the CSVs in Excel/Sheets for the full export (includes Foxy after the delivery overhaul).
 
 ---
 
@@ -82,9 +86,9 @@ Not random. Each account has a **health profile** that cycles fixed patterns:
 
 | Profile | CSAT Q1 pattern (1–5) | NPS pattern (0–10) | Accounts |
 |---------|------------------------|--------------------|----------|
-| Healthy | 5,4,5,4,5,3,5,4 | 10,9,8,10,9,7 | Aurora, Delta, Mogu Mogu, Croffle Guys, WhiteOak |
-| Struggling | 1,3,2,4,1,2,3,1 | 0,3,6,2,5,4 | Borealis, Everest, Chemistry, SOA, BuildWell |
-| Middling | 3,4,2,5,3,1,4,5 | 9,7,6,8,10,3 | Cirrus, Inkspired, Anemos |
+| Healthy | 5,4,5,4,5,3,5,4 | 10,9,8,10,9,7 | Aurora, Delta, Mogu Mogu, Croffle Guys, WhiteOak, Anemos |
+| Struggling | 1,3,2,4,1,2,3,1 | 0,3,6,2,5,4 | Borealis, Everest, Chemistry, Foxy Retail / Hospitality / Health |
+| Middling | 3,4,2,5,3,1,4,5 | 9,7,6,8,10,3 | Cirrus, Inkspired, SOA, BuildWell, Foxy Fintech |
 
 - **~6 months** of CSAT (about **6–9 responses per account per month**)
 - **2 quarters** of NPS (**5 responses per account per quarter**)
@@ -99,7 +103,7 @@ Code: `apps/api/src/demo/demo-data.ts` (`csatScore`, `driverAnswers`, `npsScoreV
 
 1. Each CSV CSAT row → one `survey_responses` row with `score = Q1`, plus `response_answers` for Q1–Q6 (+ text).
 2. Rollup job writes `metric_rollups` (CSAT %, NPS, DSAT count, response count, …).
-3. View 1 / View 2 read rollups (and live scans only for custom date ranges).
+3. View 1 (CX metrics) / DSAT / A tracker read rollups (and live scans only for custom date ranges).
 
 If the live Neon DB was seeded with `demo:seed` on a different day, dates shift relative to “today”, but the **same patterns and volumes** apply. To align DB with these CSVs, re-seed with a fixed clock or re-run export after seed.
 

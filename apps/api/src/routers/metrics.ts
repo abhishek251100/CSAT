@@ -1,5 +1,5 @@
 import type { AppDb } from '@zoo/db'
-import { accounts, metricRollups, rcas, surveyResponses } from '@zoo/db/schema'
+import { accounts, agencies, metricRollups, rcas, surveyResponses } from '@zoo/db/schema'
 import {
   addRollupCounts,
   composeScorecard,
@@ -10,7 +10,7 @@ import {
   npsBand,
   periodBoundsUtc,
   periodsInRange,
-  SCOPE_TYPES,
+  VIEW_SCOPE_TYPES,
   type IsoDate,
   type MetricResponse,
   type Period,
@@ -38,8 +38,9 @@ import { protectedProcedure, router } from '../trpc'
  */
 
 const scopeInput = z.object({
-  scopeType: z.enum(SCOPE_TYPES),
-  scopeId: z.uuid(),
+  scopeType: z.enum(VIEW_SCOPE_TYPES),
+  /** UUID for network/agency/account; the literal `global` when scopeType is global. */
+  scopeId: z.string().min(1),
   grain: z.enum(['monthly', 'quarterly', 'custom']),
   from: z.iso.date(),
   to: z.iso.date(),
@@ -115,10 +116,25 @@ export const metricsRouter = router({
      * delta costs no extra round trip.
      */
     const previousPeriods = precedingWindow(input.grain, periods)
-    const byPeriod = await rollupCountsByPeriod(ctx.db, input.scopeType, input.scopeId, [
-      ...previousPeriods,
-      ...periods,
-    ])
+
+    /**
+     * Global has no precomputed rollup row — pool account-tier rollups
+     * response-weighted. Other tiers read their stored scope rollups.
+     */
+    let byPeriod: Map<IsoDate, RollupCounts>
+    if (input.scopeType === 'global') {
+      byPeriod = await poolAccountRollupsByPeriod(ctx.db, accountIds, [
+        ...previousPeriods,
+        ...periods,
+      ])
+    } else {
+      byPeriod = await rollupCountsByPeriod(
+        ctx.db,
+        input.scopeType as ScopeType,
+        input.scopeId,
+        [...previousPeriods, ...periods],
+      )
+    }
 
     const current = periods.reduce(
       (total, period) => addRollupCounts(total, byPeriod.get(period.start) ?? EMPTY_ROLLUP_COUNTS),
@@ -257,6 +273,70 @@ export const metricsRouter = router({
 
     return errorCategoryDistribution(rows)
   }),
+
+  /**
+   * Per-agency scorecard for network/global views — shows which agency is
+   * performing vs struggling under the selected period.
+   */
+  getAgencyBreakdown: protectedProcedure.input(scopeInput).query(async ({ ctx, input }) => {
+    if (input.scopeType !== 'network' && input.scopeType !== 'global') {
+      return []
+    }
+
+    const accountIds = await resolveScopeAccounts(
+      ctx.db,
+      ctx.session,
+      input.scopeType,
+      input.scopeId,
+    )
+
+    const named = await ctx.db
+      .select({
+        accountId: accounts.id,
+        agencyId: agencies.id,
+        agencyName: agencies.name,
+      })
+      .from(accounts)
+      .innerJoin(agencies, eq(accounts.agencyId, agencies.id))
+      .where(and(inArray(accounts.id, accountIds), isNull(accounts.deletedAt)))
+
+    const byAgency = new Map<string, { name: string; accountIds: string[] }>()
+    for (const row of named) {
+      const current = byAgency.get(row.agencyId) ?? { name: row.agencyName, accountIds: [] }
+      current.accountIds.push(row.accountId)
+      byAgency.set(row.agencyId, current)
+    }
+
+    const periods =
+      input.grain === 'custom' ? [] : periodsInRange(input.grain, input.from, input.to)
+
+    const results = []
+    for (const [agencyId, agency] of byAgency) {
+      let counts = EMPTY_ROLLUP_COUNTS
+      if (input.grain === 'custom') {
+        counts = await liveCounts(ctx.db, agency.accountIds, input.from, input.to)
+      } else if (periods.length > 0) {
+        const pooled = await poolAccountRollupsByPeriod(ctx.db, agency.accountIds, periods)
+        counts = periods.reduce(
+          (total, period) => addRollupCounts(total, pooled.get(period.start) ?? EMPTY_ROLLUP_COUNTS),
+          EMPTY_ROLLUP_COUNTS,
+        )
+      }
+      const scorecard = composeScorecard(counts)
+      results.push({
+        agencyId,
+        name: agency.name,
+        csatPercent: scorecard.csatPercent,
+        nps: scorecard.nps,
+        responseCount: scorecard.responseCount,
+        csatResponseCount: scorecard.csatResponseCount,
+        dsatCount: scorecard.dsatCount,
+        dsatRate: scorecard.dsatRate,
+      })
+    }
+
+    return results.sort((a, b) => a.name.localeCompare(b.name))
+  }),
 })
 
 // ------------------------------------------------------------------ helpers
@@ -378,6 +458,43 @@ async function accountCountsInPeriods(
   }
 
   return byAccount
+}
+
+/** Pool account-tier rollups into per-period totals (Global scope). */
+async function poolAccountRollupsByPeriod(
+  db: AppDb,
+  accountIds: readonly string[],
+  periods: readonly Period[],
+): Promise<Map<IsoDate, RollupCounts>> {
+  if (periods.length === 0 || accountIds.length === 0) return new Map()
+
+  const starts = periods.map((period) => period.start)
+  const grain = periods[0]!.grain
+
+  const rows = await db
+    .select({
+      periodStart: metricRollups.periodStart,
+      metric: metricRollups.metric,
+      value: metricRollups.value,
+    })
+    .from(metricRollups)
+    .where(
+      and(
+        eq(metricRollups.scopeType, 'account'),
+        inArray(metricRollups.scopeId, [...accountIds]),
+        eq(metricRollups.periodGrain, grain),
+        inArray(metricRollups.periodStart, starts),
+      ),
+    )
+
+  const byPeriod = new Map<IsoDate, RollupCounts>()
+
+  for (const row of rows) {
+    const current = byPeriod.get(row.periodStart) ?? EMPTY_ROLLUP_COUNTS
+    byPeriod.set(row.periodStart, applyMetricRow(current, row.metric, row.value))
+  }
+
+  return byPeriod
 }
 
 /** Folds one stored metric row into the count buckets. */

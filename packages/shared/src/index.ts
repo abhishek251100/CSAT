@@ -9,6 +9,7 @@
  * Milestone 3 adds the scope resolver contract (§5.2).
  */
 export * from './enums'
+export * from './brand-health'
 export * from './health'
 export * from './metrics'
 export * from './periods'

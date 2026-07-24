@@ -1,12 +1,9 @@
 import type { ReactNode } from 'react'
 
+export type KpiTone = 'neutral' | 'csat' | 'dsat' | 'nps'
+
 /**
- * A KPI card — SPEC.md §9 View 1.
- *
- * The delta is rendered with an arrow glyph *and* a sign, never colour alone
- * (§12: "colour is never the only signal, pair with labels/icons"). A null
- * delta renders as explanatory text rather than a zero, because "no prior
- * period" and "no change" are different facts (§6).
+ * KPI card with optional colour tone (always paired with text labels).
  */
 export function KpiCard({
   label,
@@ -15,24 +12,43 @@ export function KpiCard({
   deltaGood,
   sublabel,
   footnote,
+  tone = 'neutral',
   children,
 }: {
   label: string
   value: string
   delta?: string | null
-  /** Whether a positive delta is good. False for DSAT rate, where up is bad. */
   deltaGood?: boolean
   sublabel?: string | null
   footnote?: string
+  tone?: KpiTone
   children?: ReactNode
 }) {
   const rising = delta?.startsWith('+') ?? false
   const flat = delta === '0.0' || delta === '+0.0'
   const improving = deltaGood === false ? !rising : rising
 
+  const toneBorder =
+    tone === 'csat'
+      ? 'border-sky-800/80'
+      : tone === 'dsat'
+        ? 'border-rose-900/80'
+        : tone === 'nps'
+          ? 'border-violet-900/80'
+          : 'border-slate-800'
+
+  const toneLabel =
+    tone === 'csat'
+      ? 'text-sky-300'
+      : tone === 'dsat'
+        ? 'text-rose-300'
+        : tone === 'nps'
+          ? 'text-violet-300'
+          : 'text-slate-400'
+
   return (
-    <article className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-900 p-4">
-      <h3 className="text-xs font-medium tracking-wide text-slate-400 uppercase">{label}</h3>
+    <article className={`flex flex-col gap-2 rounded-lg border bg-slate-900 p-4 ${toneBorder}`}>
+      <h3 className={`text-xs font-medium tracking-wide uppercase ${toneLabel}`}>{label}</h3>
 
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-semibold text-slate-50 tabular-nums">{value}</span>

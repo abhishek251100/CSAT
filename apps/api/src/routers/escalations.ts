@@ -82,6 +82,70 @@ export const escalationsRouter = router({
         .orderBy(desc(escalations.reportedAt))
     }),
 
+  /**
+   * Ops table for A tracker: number, account, submitter, RCA status, category.
+   */
+  listDetailed: protectedProcedure
+    .input(z.object({ accountIds: z.array(z.uuid()).optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const { accounts, agencies, rcas, users } = await import('@zoo/db/schema')
+      const scopedIds = intersectWithScope(ctx.session, input?.accountIds)
+      if (scopedIds.length === 0) return []
+
+      const rows = await ctx.db
+        .select({
+          id: escalations.id,
+          accountId: escalations.accountId,
+          accountName: accounts.name,
+          agencyName: agencies.name,
+          title: escalations.title,
+          description: escalations.description,
+          severity: escalations.severity,
+          status: escalations.status,
+          source: escalations.source,
+          reportedAt: escalations.reportedAt,
+          raisedByUserId: escalations.raisedByUserId,
+          raisedByEmail: users.email,
+          raisedByName: users.name,
+        })
+        .from(escalations)
+        .innerJoin(accounts, eq(escalations.accountId, accounts.id))
+        .innerJoin(agencies, eq(accounts.agencyId, agencies.id))
+        .leftJoin(users, eq(escalations.raisedByUserId, users.id))
+        .where(and(inArray(escalations.accountId, scopedIds), isNull(escalations.deletedAt)))
+        .orderBy(desc(escalations.reportedAt))
+
+      const escalationIds = rows.map((row) => row.id)
+      const linked =
+        escalationIds.length === 0
+          ? []
+          : await ctx.db
+              .select({
+                id: rcas.id,
+                escalationId: rcas.escalationId,
+                status: rcas.status,
+                errorCategory: rcas.errorCategory,
+              })
+              .from(rcas)
+              .where(and(inArray(rcas.escalationId, escalationIds), isNull(rcas.deletedAt)))
+
+      const rcaByEscalation = new Map(
+        linked.filter((row) => row.escalationId).map((row) => [row.escalationId!, row]),
+      )
+
+      return rows.map((row, index) => {
+        const rca = rcaByEscalation.get(row.id)
+        return {
+          ...row,
+          number: `ESC-${String(rows.length - index).padStart(4, '0')}`,
+          submittedBy: row.raisedByName || row.raisedByEmail || 'Unknown',
+          rcaStatus: rca?.status ?? ('pending' as const),
+          errorCategory: rca?.errorCategory ?? null,
+          rcaId: rca?.id ?? null,
+        }
+      })
+    }),
+
   get: protectedProcedure
     .input(z.object({ escalationId: z.uuid() }))
     .query(async ({ ctx, input }) => {

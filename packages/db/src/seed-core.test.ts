@@ -26,7 +26,7 @@ describe('seedOrg', () => {
     const summary = await seedOrg(db)
 
     expect(summary.networkName).toBe('Zoo Media')
-    expect(summary.agencyName).toBe('The Starter Labs')
+    expect(summary.agencyNames).toEqual(['The Starter Labs', 'Foxy'])
     expect(summary.accountCount).toBe(16)
 
     // Asserted here rather than in a later test because the counts below only

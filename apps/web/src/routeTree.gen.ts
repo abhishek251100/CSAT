@@ -9,18 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ActionablesRouteImport } from './routes/actionables'
+import { Route as TrackerRouteImport } from './routes/tracker'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as DsatRouteImport } from './routes/dsat'
+import { Route as ActionablesRouteImport } from './routes/actionables'
+import { Route as AccessRouteImport } from './routes/access'
+import { Route as IndexRouteImport } from './routes/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ActionablesRoute = ActionablesRouteImport.update({
-  id: '/actionables',
-  path: '/actionables',
+const TrackerRoute = TrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -28,35 +26,67 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DsatRoute = DsatRouteImport.update({
+  id: '/dsat',
+  path: '/dsat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActionablesRoute = ActionablesRouteImport.update({
+  id: '/actionables',
+  path: '/actionables',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessRoute = AccessRouteImport.update({
+  id: '/access',
+  path: '/access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/actionables': typeof ActionablesRoute
+  '/dsat': typeof DsatRoute
   '/sign-in': typeof SignInRoute
+  '/tracker': typeof TrackerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/actionables': typeof ActionablesRoute
+  '/dsat': typeof DsatRoute
   '/sign-in': typeof SignInRoute
+  '/tracker': typeof TrackerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/actionables': typeof ActionablesRoute
+  '/dsat': typeof DsatRoute
   '/sign-in': typeof SignInRoute
+  '/tracker': typeof TrackerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/actionables' | '/sign-in'
+  fullPaths: '/' | '/access' | '/actionables' | '/dsat' | '/sign-in' | '/tracker'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/actionables' | '/sign-in'
-  id: '__root__' | '/' | '/actionables' | '/sign-in'
+  to: '/' | '/access' | '/actionables' | '/dsat' | '/sign-in' | '/tracker'
+  id: '__root__' | '/' | '/access' | '/actionables' | '/dsat' | '/sign-in' | '/tracker'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccessRoute: typeof AccessRoute
   ActionablesRoute: typeof ActionablesRoute
+  DsatRoute: typeof DsatRoute
   SignInRoute: typeof SignInRoute
+  TrackerRoute: typeof TrackerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +98,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/access': {
+      id: '/access'
+      path: '/access'
+      fullPath: '/access'
+      preLoaderRoute: typeof AccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/actionables': {
       id: '/actionables'
       path: '/actionables'
       fullPath: '/actionables'
       preLoaderRoute: typeof ActionablesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dsat': {
+      id: '/dsat'
+      path: '/dsat'
+      fullPath: '/dsat'
+      preLoaderRoute: typeof DsatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -82,13 +126,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tracker': {
+      id: '/tracker'
+      path: '/tracker'
+      fullPath: '/tracker'
+      preLoaderRoute: typeof TrackerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccessRoute: AccessRoute,
   ActionablesRoute: ActionablesRoute,
+  DsatRoute: DsatRoute,
   SignInRoute: SignInRoute,
+  TrackerRoute: TrackerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

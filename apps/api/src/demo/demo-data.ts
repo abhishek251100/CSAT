@@ -80,13 +80,21 @@ const DEMO_ACCOUNTS: readonly DemoAccountPlan[] = [
 /** Real TSL accounts (by slug) that also receive demo data, with a profile. */
 const REAL_ACCOUNT_PROFILES: ReadonlyArray<{ slug: string; profile: Profile }> = [
   { slug: 'mogu-mogu', profile: 'healthy' },
-  { slug: 'chemistry', profile: 'struggling' },
-  { slug: 'inkspired', profile: 'middling' },
-  { slug: 'soa', profile: 'struggling' },
+  { slug: 'chemistry', profile: 'middling' },
+  { slug: 'inkspired', profile: 'healthy' },
+  { slug: 'soa', profile: 'middling' },
   { slug: 'the-croffle-guys', profile: 'healthy' },
-  { slug: 'anemos', profile: 'middling' },
+  { slug: 'anemos', profile: 'healthy' },
   { slug: 'whiteoak', profile: 'healthy' },
-  { slug: 'buildwell', profile: 'struggling' },
+  { slug: 'buildwell', profile: 'middling' },
+]
+
+/** Foxy agency brands — deliberately more DSAT so network vs agency differs. */
+const FOXY_ACCOUNT_PROFILES: ReadonlyArray<{ slug: string; profile: Profile }> = [
+  { slug: 'foxy-retail-co', profile: 'struggling' },
+  { slug: 'foxy-hospitality', profile: 'struggling' },
+  { slug: 'foxy-fintech', profile: 'middling' },
+  { slug: 'foxy-health', profile: 'struggling' },
 ]
 
 /**
@@ -204,7 +212,7 @@ export async function seedDemo(db: AppDb, now: Date): Promise<DemoScope> {
     )
     .returning({ id: accounts.id, slug: accounts.slug })
 
-  // Selected real TSL accounts that also receive demo data.
+  // Selected real TSL + Foxy accounts that also receive demo data.
   const realAccountRows = await db
     .select({ id: accounts.id, slug: accounts.slug })
     .from(accounts)
@@ -214,7 +222,7 @@ export async function seedDemo(db: AppDb, now: Date): Promise<DemoScope> {
         isNull(accounts.deletedAt),
         inArray(
           accounts.slug,
-          REAL_ACCOUNT_PROFILES.map((r) => r.slug),
+          [...REAL_ACCOUNT_PROFILES, ...FOXY_ACCOUNT_PROFILES].map((r) => r.slug),
         ),
       ),
     )
@@ -222,6 +230,7 @@ export async function seedDemo(db: AppDb, now: Date): Promise<DemoScope> {
   const profileOf = new Map<string, Profile>([
     ...DEMO_ACCOUNTS.map((p) => [p.slug, p.profile] as const),
     ...REAL_ACCOUNT_PROFILES.map((p) => [p.slug, p.profile] as const),
+    ...FOXY_ACCOUNT_PROFILES.map((p) => [p.slug, p.profile] as const),
   ])
 
   const targets = [...demoAccountRows, ...realAccountRows].map((row) => ({

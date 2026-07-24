@@ -28,6 +28,17 @@ export const SCOPE_TYPES = ['network', 'agency', 'account'] as const
 export const scopeTypeSchema = z.enum(SCOPE_TYPES)
 export type ScopeType = z.infer<typeof scopeTypeSchema>
 
+/**
+ * Dashboard filter scopes. `global` is virtual (not a memberships.scope_type):
+ * it pools every account the caller can already see via memberships.
+ */
+export const VIEW_SCOPE_TYPES = ['global', 'network', 'agency', 'account'] as const
+export const viewScopeTypeSchema = z.enum(VIEW_SCOPE_TYPES)
+export type ViewScopeType = z.infer<typeof viewScopeTypeSchema>
+
+/** Sentinel scopeId when viewScopeType is `global`. */
+export const GLOBAL_SCOPE_ID = 'global' as const
+
 export const METRIC_TYPES = ['csat', 'nps'] as const
 export const metricTypeSchema = z.enum(METRIC_TYPES)
 export type MetricType = z.infer<typeof metricTypeSchema>

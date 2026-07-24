@@ -1,8 +1,8 @@
 /**
- * Seed data — SPEC.md §13.
+ * Seed data — SPEC.md §13 + Foxy agency (delivery overhaul).
  *
- * One network (Zoo Media), one agency (The Starter Labs), and the 16 accounts
- * with their external Google references.
+ * One network (Zoo Media), two real agencies (The Starter Labs + Foxy), the 16
+ * TSL accounts with their external Google references, and a smaller Foxy book.
  */
 
 export interface SeedAccount {
@@ -24,6 +24,37 @@ export interface SeedAccount {
 export const SEED_NETWORK = { name: 'Zoo Media', slug: 'zoo-media' } as const
 
 export const SEED_AGENCY = { name: 'The Starter Labs', slug: 'the-starter-labs' } as const
+
+/** Second real agency under Zoo Media — used for multi-agency network rollups. */
+export const SEED_AGENCY_FOXY = { name: 'Foxy', slug: 'foxy' } as const
+
+/** Foxy client brands (no Google Form links yet — filled during sync setup). */
+export const SEED_FOXY_ACCOUNTS: readonly SeedAccount[] = [
+  {
+    name: 'Foxy Retail Co',
+    slug: 'foxy-retail-co',
+    externalFormUrl: null,
+    externalSheetId: null,
+  },
+  {
+    name: 'Foxy Hospitality',
+    slug: 'foxy-hospitality',
+    externalFormUrl: null,
+    externalSheetId: null,
+  },
+  {
+    name: 'Foxy Fintech',
+    slug: 'foxy-fintech',
+    externalFormUrl: null,
+    externalSheetId: null,
+  },
+  {
+    name: 'Foxy Health',
+    slug: 'foxy-health',
+    externalFormUrl: null,
+    externalSheetId: null,
+  },
+] as const
 
 /**
  * Extracts a Google Form id from an editor URL.

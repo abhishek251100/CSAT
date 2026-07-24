@@ -14,7 +14,7 @@ Share this with stakeholders reviewing the tool. It describes what populates the
 | Domain allowlist | Only `@thestarterlabs.com` and `@zoomedia.com` (plus break-glass email) can sign in |
 | Membership | A separate `memberships` row decides **which accounts** they can see |
 
-If the banner says *"You have no account memberships yet…"*, the user is authenticated but has **zero memberships**. That is intentional (closed by default). There is **no admin UI yet** to grant access — an administrator must insert a membership (SQL below) or use the break-glass account.
+If the banner says *"You have no account memberships yet…"*, the user is authenticated but has **zero memberships**. That is intentional (closed by default). Prefer the in-app **Access** tab (admins with `manage_users`), or the CLI / SQL below.
 
 ### Grant network-wide access (recommended for reviewers)
 
@@ -65,7 +65,10 @@ Signs in with `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` (email form on `/sign-i
 |------|------|------|--------|
 | Network | Zoo Media | `zoo-media` | Real |
 | Agency | The Starter Labs | `the-starter-labs` | Real — 16 client accounts |
+| Agency | Foxy | `foxy` | Real — 4 client brands (asymmetric demo vs TSL) |
 | Agency | Demo Agency | `demo-agency` | **Demo only** (`is_demo = true`) — 5 fake brands |
+
+**Dashboard scopes:** Global (virtual — all visible accounts) · Network · Agency · Account.
 
 ### 16 real TSL accounts (client brands)
 
@@ -97,6 +100,7 @@ CSV snapshots (if present): `demo-data-summary.csv`, `demo-data-responses.csv`.
 | Demo Agency | Under Zoo Media, with 5 accounts |
 | Demo accounts | Aurora Foods, Borealis Bank, Cirrus Tech, Delta Retail, Everest Media |
 | Also seeded on 8 real TSL accounts | Mogu Mogu, Chemistry, Inkspired, SOA, The Croffle Guys, Anemos, WhiteOak, BuildWell |
+| Also seeded on 4 Foxy brands | Foxy Retail Co, Foxy Hospitality, Foxy Fintech, Foxy Health (mostly struggling) |
 | Left empty (no demo responses) | AJ, Alka Seltzer, EPCH, HyKr, Ryan, Spunge, Standard Chartered, Sunteck |
 | CSAT | ~6 months of monthly responses; headline score = **Q1 overall satisfaction** (1–5); Q2–Q6 = drivers; plus free-text feedback |
 | NPS | Separate instrument; ~2 quarters; score 0–10 |
@@ -112,13 +116,15 @@ CSV snapshots (if present): `demo-data-summary.csv`, `demo-data-responses.csv`.
 | The Starter Labs (8 of 16) | 8 | ~440 | ~12 | ~20 | ~20 |
 | **Total demo-flagged** | **13 targets** | **~713** | **~19** | **~32** | **~32** |
 
-Health profiles (so the leaderboard spreads):
+Health profiles (so the leaderboard and agency breakdown spread):
 
-| Profile | Demo accounts | Real TSL accounts |
-|---------|---------------|-------------------|
-| Healthy | Aurora Foods, Delta Retail | Mogu Mogu, The Croffle Guys, WhiteOak |
-| Middling | Cirrus Tech | Inkspired, Anemos |
-| Struggling | Borealis Bank, Everest Media | Chemistry, SOA, BuildWell |
+| Profile | Demo accounts | Real TSL accounts | Foxy |
+|---------|---------------|-------------------|------|
+| Healthy | Aurora Foods, Delta Retail | Mogu Mogu, The Croffle Guys, WhiteOak, Anemos | — |
+| Middling | Cirrus Tech | Inkspired, SOA, BuildWell | Foxy Fintech |
+| Struggling | Borealis Bank, Everest Media | Chemistry | Foxy Retail, Hospitality, Health |
+
+TSL is nudged healthier overall; **Foxy is deliberately weaker** so Network / Global vs Agency views differ clearly.
 
 ### Metrics methodology (matches product docs)
 
@@ -133,9 +139,11 @@ Health profiles (so the leaderboard spreads):
 ## 4. What reviewers should click through
 
 1. Sign in (Google on allowlisted domain **with membership**, or break-glass).
-2. **Satisfaction & Loyalty** (`/`) — KPIs, CSAT/NPS trends, bands, distribution, account leaderboard.
-3. Switch scope: Account → Agency (TSL vs Demo Agency) → Network (Zoo Media) and confirm numbers differ.
-4. **Feedback & Actionables** (`/actionables`) — open escalations, DSAT count, overdue actions, error-category pie, RCA tracker.
+2. **CX metrics** (`/`) — Global / Network / Agency / Account, period chip, agency breakdown, CSAT-left charts, brand health.
+3. Switch agency: **The Starter Labs** vs **Foxy** and confirm CSAT/DSAT diverge; Network pools both.
+4. **DSAT** (`/dsat`) — list, submitter, pending RCA, row drill-down; optional manual entry.
+5. **A tracker** (`/tracker`) — numbered escalations, RCA tracker, actions.
+6. **Access** (admins) — grant/revoke memberships.
 
 ---
 
@@ -143,23 +151,24 @@ Health profiles (so the leaderboard spreads):
 
 | Issue | Notes |
 |-------|--------|
-| No “grant membership” UI | Spec’d; not built yet. Grant via SQL or break-glass only. |
-| Empty membership banner mainly on View 1 | View 2 can look “empty” without the same amber explanation. |
-| View 2 date range | KPI / pie honor the period; escalation / action **lists** are scope-filtered only (not date-filtered). Period controls there can feel misleading. |
+| Live Google Forms sync | Milestone 8 — not in this pass. Manual entry + demo import remain the feedback paths. |
+| Escalation / action lists | Scope-filtered; not all list endpoints date-filter the same way as scorecards. |
 | Dates in 2026 | Environment clock / seed window; demo is relative to “today” at seed time (~last 6 months). |
 | Partial account grants | Agency/network aggregate options only appear if the user can see **all** accounts in that scope (anti-leak rule). |
-| Sparkline on KPI cards | Spec mentions trend sparkline; UI shows delta text, not a sparkline. |
-| Average CSAT | Spec secondary metric; not shown as its own KPI on View 1. |
+| Average CSAT | Spec secondary metric; not shown as its own KPI. |
 
 ---
 
 ## 6. Quick FAQ
 
 **Q: Google login works but dashboard is blank.**  
-A: Grant a `memberships` row (section 1). Domain login alone is not enough.
+A: Grant a `memberships` row via **Access**, CLI, or SQL (section 1). Domain login alone is not enough.
 
 **Q: Is demo data production-safe to purge?**  
-A: Yes — only `is_demo = true` rows. Real network, TSL agency, and 16 account rows remain.
+A: Yes — only `is_demo = true` rows. Real network, TSL, Foxy, and account rows remain.
 
 **Q: Do the 16 Google Forms sync into the app today?**  
 A: Not yet (Milestone 8). Current charts are **demo seed + any manual entry**, not live Forms sync.
+
+**Q: What is Global scope?**  
+A: A virtual filter that pools every account your memberships already allow — not a DB membership type.

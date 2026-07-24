@@ -2,22 +2,24 @@ import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
 /**
- * Shared header for the two dashboard views (§9), with tabs between them and
- * sign-out. The active tab is derived from the route, so the two views present
- * as one app rather than two pages.
+ * Shared header — three delivery tabs + optional Access for admins.
  */
 export function DashboardHeader({
   email,
   onSignOut,
+  showAccess = false,
 }: {
   email: string | undefined
   onSignOut: () => void
+  showAccess?: boolean
 }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
-      <nav className="flex items-center gap-1" aria-label="Views">
-        <Tab to="/">Satisfaction &amp; Loyalty</Tab>
-        <Tab to="/actionables">Feedback &amp; Actionables</Tab>
+      <nav className="flex flex-wrap items-center gap-1" aria-label="Views">
+        <Tab to="/">CX metrics</Tab>
+        <Tab to="/dsat">DSAT</Tab>
+        <Tab to="/tracker">A tracker</Tab>
+        {showAccess && <Tab to="/access">Access</Tab>}
       </nav>
       <div className="flex items-center gap-3 text-xs text-slate-500">
         {email && <span>{email}</span>}

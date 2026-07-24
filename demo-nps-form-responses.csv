@@ -79,16 +79,16 @@ Timestamp,Agency,Account,How likely are you to recommend us to a colleague or pe
 2026-07-12,The Starter Labs,Inkspired,8,passive
 2026-07-12,The Starter Labs,Inkspired,10,promoter
 2026-07-12,The Starter Labs,Inkspired,3,detractor
-2026-04-12,The Starter Labs,SOA,2,detractor
-2026-04-12,The Starter Labs,SOA,5,detractor
-2026-04-12,The Starter Labs,SOA,4,detractor
-2026-04-12,The Starter Labs,SOA,0,detractor
+2026-04-12,The Starter Labs,SOA,8,passive
+2026-04-12,The Starter Labs,SOA,10,promoter
 2026-04-12,The Starter Labs,SOA,3,detractor
+2026-04-12,The Starter Labs,SOA,9,promoter
+2026-04-12,The Starter Labs,SOA,7,passive
 2026-07-12,The Starter Labs,SOA,6,detractor
-2026-07-12,The Starter Labs,SOA,2,detractor
-2026-07-12,The Starter Labs,SOA,5,detractor
-2026-07-12,The Starter Labs,SOA,4,detractor
-2026-07-12,The Starter Labs,SOA,0,detractor
+2026-07-12,The Starter Labs,SOA,8,passive
+2026-07-12,The Starter Labs,SOA,10,promoter
+2026-07-12,The Starter Labs,SOA,3,detractor
+2026-07-12,The Starter Labs,SOA,9,promoter
 2026-04-12,The Starter Labs,The Croffle Guys,9,promoter
 2026-04-12,The Starter Labs,The Croffle Guys,7,passive
 2026-04-12,The Starter Labs,The Croffle Guys,10,promoter
@@ -99,16 +99,16 @@ Timestamp,Agency,Account,How likely are you to recommend us to a colleague or pe
 2026-07-12,The Starter Labs,The Croffle Guys,7,passive
 2026-07-12,The Starter Labs,The Croffle Guys,10,promoter
 2026-07-12,The Starter Labs,The Croffle Guys,9,promoter
-2026-04-12,The Starter Labs,Anemos,3,detractor
-2026-04-12,The Starter Labs,Anemos,9,promoter
 2026-04-12,The Starter Labs,Anemos,7,passive
-2026-04-12,The Starter Labs,Anemos,6,detractor
+2026-04-12,The Starter Labs,Anemos,10,promoter
+2026-04-12,The Starter Labs,Anemos,9,promoter
 2026-04-12,The Starter Labs,Anemos,8,passive
-2026-07-12,The Starter Labs,Anemos,10,promoter
-2026-07-12,The Starter Labs,Anemos,3,detractor
+2026-04-12,The Starter Labs,Anemos,10,promoter
 2026-07-12,The Starter Labs,Anemos,9,promoter
 2026-07-12,The Starter Labs,Anemos,7,passive
-2026-07-12,The Starter Labs,Anemos,6,detractor
+2026-07-12,The Starter Labs,Anemos,10,promoter
+2026-07-12,The Starter Labs,Anemos,9,promoter
+2026-07-12,The Starter Labs,Anemos,8,passive
 2026-04-12,The Starter Labs,WhiteOak,10,promoter
 2026-04-12,The Starter Labs,WhiteOak,9,promoter
 2026-04-12,The Starter Labs,WhiteOak,8,passive
@@ -119,13 +119,53 @@ Timestamp,Agency,Account,How likely are you to recommend us to a colleague or pe
 2026-07-12,The Starter Labs,WhiteOak,9,promoter
 2026-07-12,The Starter Labs,WhiteOak,8,passive
 2026-07-12,The Starter Labs,WhiteOak,10,promoter
-2026-04-12,The Starter Labs,BuildWell,3,detractor
+2026-04-12,The Starter Labs,BuildWell,7,passive
 2026-04-12,The Starter Labs,BuildWell,6,detractor
-2026-04-12,The Starter Labs,BuildWell,2,detractor
-2026-04-12,The Starter Labs,BuildWell,5,detractor
-2026-04-12,The Starter Labs,BuildWell,4,detractor
-2026-07-12,The Starter Labs,BuildWell,0,detractor
-2026-07-12,The Starter Labs,BuildWell,3,detractor
+2026-04-12,The Starter Labs,BuildWell,8,passive
+2026-04-12,The Starter Labs,BuildWell,10,promoter
+2026-04-12,The Starter Labs,BuildWell,3,detractor
+2026-07-12,The Starter Labs,BuildWell,9,promoter
+2026-07-12,The Starter Labs,BuildWell,7,passive
 2026-07-12,The Starter Labs,BuildWell,6,detractor
-2026-07-12,The Starter Labs,BuildWell,2,detractor
-2026-07-12,The Starter Labs,BuildWell,5,detractor
+2026-07-12,The Starter Labs,BuildWell,8,passive
+2026-07-12,The Starter Labs,BuildWell,10,promoter
+2026-04-12,Foxy,Foxy Retail Co,6,detractor
+2026-04-12,Foxy,Foxy Retail Co,2,detractor
+2026-04-12,Foxy,Foxy Retail Co,5,detractor
+2026-04-12,Foxy,Foxy Retail Co,4,detractor
+2026-04-12,Foxy,Foxy Retail Co,0,detractor
+2026-07-12,Foxy,Foxy Retail Co,3,detractor
+2026-07-12,Foxy,Foxy Retail Co,6,detractor
+2026-07-12,Foxy,Foxy Retail Co,2,detractor
+2026-07-12,Foxy,Foxy Retail Co,5,detractor
+2026-07-12,Foxy,Foxy Retail Co,4,detractor
+2026-04-12,Foxy,Foxy Hospitality,2,detractor
+2026-04-12,Foxy,Foxy Hospitality,5,detractor
+2026-04-12,Foxy,Foxy Hospitality,4,detractor
+2026-04-12,Foxy,Foxy Hospitality,0,detractor
+2026-04-12,Foxy,Foxy Hospitality,3,detractor
+2026-07-12,Foxy,Foxy Hospitality,6,detractor
+2026-07-12,Foxy,Foxy Hospitality,2,detractor
+2026-07-12,Foxy,Foxy Hospitality,5,detractor
+2026-07-12,Foxy,Foxy Hospitality,4,detractor
+2026-07-12,Foxy,Foxy Hospitality,0,detractor
+2026-04-12,Foxy,Foxy Fintech,10,promoter
+2026-04-12,Foxy,Foxy Fintech,3,detractor
+2026-04-12,Foxy,Foxy Fintech,9,promoter
+2026-04-12,Foxy,Foxy Fintech,7,passive
+2026-04-12,Foxy,Foxy Fintech,6,detractor
+2026-07-12,Foxy,Foxy Fintech,8,passive
+2026-07-12,Foxy,Foxy Fintech,10,promoter
+2026-07-12,Foxy,Foxy Fintech,3,detractor
+2026-07-12,Foxy,Foxy Fintech,9,promoter
+2026-07-12,Foxy,Foxy Fintech,7,passive
+2026-04-12,Foxy,Foxy Health,4,detractor
+2026-04-12,Foxy,Foxy Health,0,detractor
+2026-04-12,Foxy,Foxy Health,3,detractor
+2026-04-12,Foxy,Foxy Health,6,detractor
+2026-04-12,Foxy,Foxy Health,2,detractor
+2026-07-12,Foxy,Foxy Health,5,detractor
+2026-07-12,Foxy,Foxy Health,4,detractor
+2026-07-12,Foxy,Foxy Health,0,detractor
+2026-07-12,Foxy,Foxy Health,3,detractor
+2026-07-12,Foxy,Foxy Health,6,detractor
