@@ -13,6 +13,11 @@ https://<your-app>.vercel.app/api/*        -> Hono function         [serverless]
       /api/health     liveness
       /api/trpc/*     tRPC
       /api/auth/*     better-auth (Google + break-glass)
+
+The function entry is `apps/web/api/[[...route]].js` (filesystem catch-all). It
+re-exports the esbuild bundle from `server/build.mjs`. Do **not** rewrite
+`/api/*` onto a bare `/api` destination — that can drop the path Hono needs for
+`/api/auth/callback/google`.
 ```
 
 The frontend calls the API with **relative** URLs in production (`VITE_API_URL`
@@ -28,16 +33,16 @@ Import this repo in Vercel, then set:
 | -------------------- | ----------------------------------------------------------------------------------------- |
 | **Root Directory**   | `apps/web`                                                                                |
 | **Framework Preset** | Vite (auto-detected)                                                                      |
-| **Build Command**    | `vite build` (from `apps/web/vercel.json`)                                                |
+| **Build Command**    | `vite build && node server/build.mjs` (from `apps/web/vercel.json`)                       |
 | **Output Directory** | `dist` (from `apps/web/vercel.json`)                                                      |
 | **Install Command**  | leave default — Vercel runs `pnpm install` at the repo root and links the whole workspace |
 | **Node.js Version**  | 22.x (matches `engines.node >=22.13`)                                                     |
 
 Vercel reads `packageManager` (`pnpm@10.34.5`) from the root `package.json` and
-uses pnpm automatically. The `api/` folder under the root directory is detected
-as serverless functions with no extra config; `apps/web/vercel.json` adds the
-SPA fallback rewrite (`/((?!api/).*) -> /index.html`) so client-side routes like
-`/actionables` resolve to `index.html` while `/api/*` goes to the function.
+uses pnpm automatically. The catch-all at `apps/web/api/[[...route]].js` is the
+serverless function for every `/api` path; `apps/web/vercel.json` only adds the
+SPA fallback rewrite so client-side routes like `/actionables` resolve to
+`index.html` while `/api/*` stays on the function.
 
 ## 2. Environment variables (Vercel → Project → Settings → Environment Variables)
 
@@ -108,8 +113,9 @@ if Google is disabled), and sign in.
   the Neon **HTTP** driver (`@neondatabase/serverless`), which is built for
   serverless — no connection pool to manage, no cold-start pool exhaustion.
 - **The Hono app is unchanged** across hosts. `apps/api/src/server.ts` is the
-  local Node entry; `apps/web/api/[[...route]].ts` is the Vercel entry. Both call
-  the same `createApp(env)` — swapping hosts replaces the entry file, not the app
+  local Node entry; `apps/web/server/handler.ts` (bundled, re-exported from
+  `apps/web/api/[[...route]].js`) is the Vercel entry. Both call the same
+  `createApp(env)` — swapping hosts replaces the entry file, not the app
   (SPEC.md §16 #6).
 - **Demo data** (`demo:seed`/`demo:purge`) is a CLI you run from your machine
   against `DATABASE_URL`; it is not part of the deployment and refuses to run

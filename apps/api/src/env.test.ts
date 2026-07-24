@@ -180,6 +180,15 @@ describe('parseServerEnv — auth configuration (§5, §16 #4)', () => {
     expect(env.SUPERADMIN_EMAIL).toBe('breakglass@zoo.example')
   })
 
+  it('trims SUPERADMIN_EMAIL so a trailing space from a copy-paste cannot lock you out', () => {
+    const env = parseServerEnv({
+      ...validEnv,
+      SUPERADMIN_EMAIL: 'breakglass@offlist.example ',
+    })
+
+    expect(env.SUPERADMIN_EMAIL).toBe('breakglass@offlist.example')
+  })
+
   it('rejects a weak SUPERADMIN_PASSWORD', () => {
     expect(() => parseServerEnv({ ...validEnv, SUPERADMIN_PASSWORD: 'short' })).toThrow(
       /SUPERADMIN_PASSWORD/,

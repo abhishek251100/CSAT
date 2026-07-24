@@ -125,7 +125,15 @@ export const serverEnvSchema = databaseEnvSchema.extend({
    * Google — the way back in when SSO itself is broken. Deliberately exempt
    * from the domain restriction, since it may well be off-domain.
    */
-  SUPERADMIN_EMAIL: z.email().transform((value) => value.toLowerCase()),
+  /**
+   * Trim before validating: a trailing space from a copy-paste survives into
+   * the email and either fails Zod or creates an admin address nobody can type.
+   */
+  SUPERADMIN_EMAIL: z
+    .string()
+    .trim()
+    .pipe(z.email())
+    .transform((value) => value.toLowerCase()),
   SUPERADMIN_PASSWORD: z.string().min(12, 'SUPERADMIN_PASSWORD must be at least 12 characters'),
 })
 
